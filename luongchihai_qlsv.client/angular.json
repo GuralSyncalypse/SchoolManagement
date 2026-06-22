@@ -2,7 +2,8 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": "5b322e12-cdc0-4c19-b2b6-ba13c712e789"
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -81,7 +82,7 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "karmaConfig": "karma.conf.js"
+            "providersFile": "src/app/app.spec.ts"
           }
         }
       }

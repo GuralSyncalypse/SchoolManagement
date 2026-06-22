@@ -1,0 +1,55 @@
+<div class="container">
+  <div class="table-header-actions">
+    <h2>Danh sách sinh viên</h2>
+    <button (click)="onCreate()" class="btn btn-create">
+      <span class="icon">➕</span> Thêm sinh viên mới
+    </button>
+  </div>
+
+  @if (students().length > 0) {
+  <div class="table-responsive">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>Mã SV</th>
+          <th>Tên Sinh Viên</th>
+          <th>Ngày Sinh</th>
+          <th>Giới Tính</th>
+          <th>Email</th>
+          <th class="text-center">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (student of students(); track student.studentID) {
+        <tr>
+          <td><span class="badge-id">{{ student.studentID }}</span></td>
+          <td class="font-semibold">{{ student.studentName }}</td>
+          <td>{{ student.birthDate | date:'dd/MM/yyyy' }}</td>
+          <td>
+            <span class="badge-gender" [class.male]="student.gender === 'Nam'" [class.female]="student.gender === 'Nữ'">
+              {{ student.gender || 'Chưa rõ' }}
+            </span>
+          </td>
+          <td class="text-muted">{{ student.email || 'Không có' }}</td>
+          <td class="text-center">
+            <div class="action-buttons">
+              <button (click)="onUpdate(student)" class="btn btn-edit" title="Sửa">
+                ✏️ <span class="btn-text">Sửa</span>
+              </button>
+              <button (click)="onDelete(student.studentID)" class="btn btn-delete" title="Xóa">
+                🗑️ <span class="btn-text">Xóa</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  } @else {
+  <div class="empty-state">
+    <div class="loader"></div>
+    <p>Đang tải dữ liệu hoặc không có sinh viên nào...</p>
+  </div>
+  }
+</div>

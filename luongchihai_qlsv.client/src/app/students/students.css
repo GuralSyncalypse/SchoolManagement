@@ -1,0 +1,205 @@
+/* Tổng quan container */
+.container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+/* Thanh công cụ phía trên */
+.table-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 15px;
+}
+
+  .table-header-actions h2 {
+    margin: 0;
+    color: #333;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+/* Nút bấm tổng quát */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+  .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn:active {
+    transform: translateY(0);
+  }
+
+/* Các loại nút cụ thể */
+.btn-create {
+  background-color: #28a745;
+  color: white;
+}
+
+  .btn-create:hover {
+    background-color: #218838;
+  }
+
+.btn-edit {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+  .btn-edit:hover {
+    background-color: #e0a800;
+  }
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+  .btn-delete:hover {
+    background-color: #bd2130;
+  }
+
+/* Bảng dữ liệu hiện đại */
+.table-responsive {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+  .modern-table th {
+    background-color: #f1f3f5;
+    color: #495057;
+    font-weight: 600;
+    padding: 14px 16px;
+    border-bottom: 2px solid #dee2e6;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+    letter-spacing: 0.5px;
+  }
+
+  .modern-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #dee2e6;
+    color: #495057;
+    font-size: 0.95rem;
+    vertical-align: middle;
+  }
+
+  /* Hiệu ứng di chuột qua các dòng */
+  .modern-table tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+/* Định dạng các trường đặc biệt */
+.text-center {
+  text-align: center !important;
+}
+
+.font-semibold {
+  font-weight: 600;
+  color: #212529;
+}
+
+.text-muted {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Các nhãn (Badge) trang trí */
+.badge-id {
+  background-color: #e8f0fe;
+  color: #1a73e8;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.badge-gender {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background-color: #e9ecef;
+}
+
+  .badge-gender.male {
+    background-color: #cfe2ff;
+    color: #084298;
+  }
+
+  .badge-gender.female {
+    background-color: #f8d7da;
+    color: #842029;
+  }
+
+/* Trạng thái trống / đang tải */
+.empty-state {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+  background: white;
+  border-radius: 8px;
+}
+
+.loader {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1a73e8;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 15px auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive cho màn hình nhỏ (ẩn chữ trên nút hành động) */
+@media (max-width: 768px) {
+  .btn-text {
+    display: none;
+  }
+
+  .btn {
+    padding: 8px 10px;
+  }
+}
