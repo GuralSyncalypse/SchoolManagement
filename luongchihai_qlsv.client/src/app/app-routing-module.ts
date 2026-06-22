@@ -4,12 +4,16 @@ import { RouterModule, Routes } from '@angular/router';
 // Import your components based on your folder structure
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { Students } from './students/students';
-// import { CoursesComponent } from './courses/courses.component';
+import { Courses } from './courses/courses';
+import { CourseForm } from './courses/form/form';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'students', component: Students },
+  { path: 'courses', component: Courses },
+  { path: 'courses/create', component: CourseForm },
+  { path: 'courses/edit/:id', component: CourseForm },
   { path: '**', redirectTo: 'dashboard' }
 ];
 
