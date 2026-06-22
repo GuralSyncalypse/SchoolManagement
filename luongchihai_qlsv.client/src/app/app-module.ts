@@ -7,6 +7,7 @@ import { App } from './app';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { Students } from './students/students';
+import { StudentForm } from './students/form/form';
 import { Courses } from './courses/courses';
 import { CourseForm } from './courses/form/form';
 
@@ -18,6 +19,7 @@ import { CourseForm } from './courses/form/form';
     AppRoutingModule,
     DashboardComponent,
     Students,
+    StudentForm,
     Courses,
     CourseForm
   ],

@@ -1,0 +1,125 @@
+/* Khối bao bọc toàn bộ biểu mẫu (Form Container) */
+.form-container {
+  max-width: 550px;
+  margin: 30px auto;
+  padding: 28px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Phần đầu của biểu mẫu (Tiêu đề và mô tả) */
+.form-header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid #f1f2f6;
+  padding-bottom: 12px;
+}
+
+  .form-header h3 {
+    color: #2c3e50;
+    margin: 0 0 6px 0;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .form-header p {
+    color: #7f8c8d;
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+/* Cấu trúc các nhóm ô nhập liệu */
+.form-group {
+  margin-bottom: 20px;
+}
+
+  .form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #34495e;
+    font-size: 14px;
+  }
+
+/* Dấu sao đỏ biểu thị trường bắt buộc */
+.required {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* Định dạng chung cho Input, Select */
+.form-group input,
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #dcdde1;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #2f3640;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+  /* Hiệu ứng khi người dùng tập trung vào ô nhập liệu */
+  .form-group input:focus,
+  .form-select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 4px rgba(52, 152, 219, 0.2);
+  }
+
+/* Định dạng riêng cho thẻ Select để hiển thị con trỏ dạng click */
+.form-select {
+  cursor: pointer;
+  appearance: none; /* Khử giao diện mặc định của trình duyệt */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%232c3e50' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+
+  /* Trạng thái ô nhập liệu không hợp lệ (Validation Error) */
+  .form-group input.invalid,
+  .form-select.invalid {
+    border-color: #e74c3c;
+    background-color: #fff5f5;
+  }
+
+/* Thông báo lỗi hiển thị bên dưới ô nhập liệu */
+.error-text {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 6px;
+  display: block;
+  font-weight: 400;
+}
+
+/* Khu vực chứa các nút bấm hành động (Cuối form) */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 26px;
+  border-top: 1px solid #f1f2f6;
+  padding-top: 18px;
+}
+
+  /* Định dạng cấu trúc các nút bấm */
+  .form-actions button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+
+/* Nút Hủy bỏ / Quay lại */
+.btn-secondary {
+  background-color: #f1f2f6;
