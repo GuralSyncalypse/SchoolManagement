@@ -123,3 +123,42 @@
 /* Nút Hủy bỏ / Quay lại */
 .btn-secondary {
   background-color: #f1f2f6;
+  color: #57606f;
+}
+
+  .btn-secondary:hover:not(:disabled) {
+    background-color: #dfe4ea;
+  }
+
+/* Nút Lưu bản ghi */
+.btn-primary {
+  background-color: #3498db;
+  color: #ffffff;
+}
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: #2980b9;
+  }
+
+/* Trạng thái nút bấm bị vô hiệu hóa khi form chưa hợp lệ hoặc đang gửi dữ liệu */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Định dạng ô input khi bị khóa (disabled) */
+.form-group input:disabled {
+  background-color: #f5f6fa;
+  color: #7f8c8d;
+  cursor: not-allowed;
+  border-style: dashed; /* Tạo đường viền nét đứt báo hiệu phần không được sửa */
+}
+
+/* Dòng chữ ghi chú nhỏ màu xám */
+.info-text {
+  color: #7f8c8d;
+  font-size: 12px;
+  margin-top: 6px;
+  display: block;
+  font-style: italic;
+}
