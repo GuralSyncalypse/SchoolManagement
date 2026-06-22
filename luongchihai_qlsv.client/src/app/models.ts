@@ -16,3 +16,14 @@ export interface Student {
   // Navigation property: Danh sách các lượt đăng ký học phần của sinh viên này
   enrollments?: Enrollment[];
 }
+
+export interface Course {
+  courseID: number;       // Không dùng dấu ? vì đây là Khoá chính (Primary Key)
+  courseName: string;
+  courseCode: string;
+  credits?: number;
+
+  // Navigation property: Danh sách các lượt đăng ký học phần của sinh viên này
+  enrollments?: Enrollment[];
+}
+
