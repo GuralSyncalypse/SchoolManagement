@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Student } from '../../models';
+import { StudentDetailDTO } from '../../models';
 import { StudentService } from '../students.service';
 
 @Component({
@@ -21,59 +21,102 @@ export class StudentForm implements OnInit {
   isEditMode = signal<boolean>(false);
   isViewMode = signal<boolean>(false);
 
+  // Định nghĩa FormGroup chứa toàn bộ thông tin phẳng của StudentDetailDTO
   studentForm = new FormGroup({
-    // BỔ SUNG VALIDATION: Mã số sinh viên bắt buộc nhập, tối thiểu 5 ký tự
-    studentID: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(5)]
-    }),
-    studentName: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.minLength(2)]
-    }),
-    birthDate: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required]
-    }),
-    gender: new FormControl<string>('Nam', { nonNullable: true }),
-    email: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.email]
-    })
+    // ==========================================
+    // 👤 NHÓM THÔNG TIN CƠ BẢN (BẮT BUỘC PHẢI CÓ)
+    // ==========================================
+    studentID: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.minLength(5)] }),
+    studentName: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
+    gender: new FormControl<string>('Nam', { nonNullable: true }), // Mặc định là Nam, không sợ trống
+    birthDate: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
+    phoneNumber: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
+    email: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
+
+    // ==========================================
+    // 🎓 NHÓM THÔNG TIN HỌC VẤN (BỔ SUNG SAU - KHÔNG validator)
+    // ==========================================
+    className: new FormControl<string>('', { nonNullable: true }),
+    status: new FormControl<string>('Đang học', { nonNullable: true }),
+    facultyName: new FormControl<string>('', { nonNullable: true }),
+    majorName: new FormControl<string>('', { nonNullable: true }),
+    specializationName: new FormControl<string>('', { nonNullable: true }),
+    educationLevel: new FormControl<string>('Đại học', { nonNullable: true }),
+    educationType: new FormControl<string>('Chính quy', { nonNullable: true }),
+    academicYear: new FormControl<number>(new Date().getFullYear(), { nonNullable: true }),
+    admissionDate: new FormControl<string>('', { nonNullable: true }),
+    campusName: new FormControl<string>('', { nonNullable: true }),
+
+    // ==========================================
+    // 📝 NHÓM THÔNG TIN ĐỊNH DANH (BỔ SUNG SAU - KHÔNG validator)
+    // ==========================================
+    birthPlace: new FormControl<string>('', { nonNullable: true }),
+    citizenID: new FormControl<string>('', { nonNullable: true, validators: [Validators.maxLength(12)] }), // Chỉ check nếu có gõ
+    citizenIDIssueDate: new FormControl<string>('', { nonNullable: true }),
+    citizenIDIssuePlace: new FormControl<string>('', { nonNullable: true }),
+    ethnicity: new FormControl<string>('Kinh', { nonNullable: true }),
+    religion: new FormControl<string>('Không', { nonNullable: true }),
+    nationality: new FormControl<string>('Việt Nam', { nonNullable: true }),
+    permanentAddress: new FormControl<string>('', { nonNullable: true }),
+    temporaryAddress: new FormControl<string>('', { nonNullable: true })
   });
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
-    // Kiểm tra xem URL hiện tại có chứa từ khóa 'view' hay không
     const isViewRoute = this.router.url.includes('/view/');
 
     if (idParam) {
       if (isViewRoute) {
-        this.isViewMode.set(true); // Kích hoạt chế độ Xem chi tiết
+        this.isViewMode.set(true);
       } else {
-        this.isEditMode.set(true); // Kích hoạt chế độ Chỉnh sửa
+        this.isEditMode.set(true);
       }
 
-      // XỬ LÝ KHÓA KHÓA CHÍNH: Khóa ô nhập mã số sinh viên khi ở chế độ chỉnh sửa
       this.studentForm.get('studentID')?.disable();
 
       this.studentService.getStudentById(idParam).subscribe({
         next: (student) => {
           if (student) {
-            const formattedDate = student.birthDate ? student.birthDate.substring(0, 10) : '';
+            // Định dạng chuỗi ngày YYYY-MM-DD để hiển thị chuẩn trên thẻ <input type="date">
+            const fmtBirthDate = student.birthDate ? student.birthDate.substring(0, 10) : '';
+            const fmtAdmissionDate = student.admissionDate ? student.admissionDate.substring(0, 10) : '';
+            const fmtCitizenDate = student.citizenIDIssueDate ? student.citizenIDIssueDate.substring(0, 10) : '';
 
+            // Đổ toàn bộ dữ liệu nhận từ DTO vào Form
             this.studentForm.patchValue({
               studentID: student.studentID,
               studentName: student.studentName,
-              birthDate: formattedDate,
               gender: student.gender || 'Nam',
-              email: student.email || ''
+
+              admissionDate: fmtAdmissionDate,
+              className: student.className,
+              campusName: student.campusName,
+              educationLevel: student.educationLevel,
+              educationType: student.educationType,
+              facultyName: student.facultyName,
+              majorName: student.majorName,
+              specializationName: student.specializationName || '',
+              academicYear: student.academicYear,
+              status: student.status,
+
+              birthDate: fmtBirthDate,
+              ethnicity: student.ethnicity,
+              religion: student.religion,
+              nationality: student.nationality,
+              birthPlace: student.birthPlace,
+              citizenID: student.citizenID,
+              citizenIDIssueDate: fmtCitizenDate,
+              citizenIDIssuePlace: student.citizenIDIssuePlace,
+              phoneNumber: student.phoneNumber,
+              email: student.email,
+              permanentAddress: student.permanentAddress,
+              temporaryAddress: student.temporaryAddress
             });
 
             if (this.isViewMode()) {
-              this.studentForm.disable(); // Khóa tất cả input, select bên trong form
+              this.studentForm.disable(); // Xem chi tiết: Khóa tất cả các ô nhập liệu
             } else {
-              this.studentForm.get('studentID')?.disable(); // Chế độ sửa chỉ khóa cấu trúc ID
+              this.studentForm.get('studentID')?.disable(); // Chỉnh sửa: Chỉ khóa Mã SV
             }
           }
         },
@@ -90,15 +133,42 @@ export class StudentForm implements OnInit {
 
     this.isSubmitting.set(true);
 
-    // LƯU Ý KỸ THUẬT: getRawValue() sẽ lấy toàn bộ dữ liệu bao gồm cả các ô đã bị disabled (như studentID)
+    // Lấy toàn bộ giá trị (Kể cả các trường bị disabled)
     const rawData = this.studentForm.getRawValue();
 
-    const studentData: Student = {
-      studentID: rawData.studentID || '',
+    // Map chuẩn xác từng trường tương ứng với cấu trúc StudentDetailDTO
+    const studentData: StudentDetailDTO = {
+      studentID: rawData.studentID,
       studentName: rawData.studentName,
-      birthDate: rawData.birthDate,
       gender: rawData.gender,
-      email: rawData.email
+
+      admissionDate: rawData.admissionDate,
+      className: rawData.className,
+      campusName: rawData.campusName,
+      educationLevel: rawData.educationLevel,
+      educationType: rawData.educationType,
+      facultyName: rawData.facultyName,
+      majorName: rawData.majorName,
+      specializationName: rawData.specializationName || undefined,
+      academicYear: Number(rawData.academicYear),
+      status: rawData.status,
+
+      birthDate: rawData.birthDate,
+      ethnicity: rawData.ethnicity,
+      religion: rawData.religion,
+      nationality: rawData.nationality,
+      birthPlace: rawData.birthPlace,
+      citizenID: rawData.citizenID,
+      citizenIDIssueDate: rawData.citizenIDIssueDate,
+      citizenIDIssuePlace: rawData.citizenIDIssuePlace,
+      phoneNumber: rawData.phoneNumber,
+      email: rawData.email,
+      permanentAddress: rawData.permanentAddress,
+      temporaryAddress: rawData.temporaryAddress,
+
+      // Tạm thời khởi tạo mảng rỗng cho phần người thân (Family Relationship) 
+      // để khớp interface, bạn có thể thiết lập FormArray xử lý phần này sau.
+      familyRelationships: []
     };
 
     if (this.isEditMode()) {
