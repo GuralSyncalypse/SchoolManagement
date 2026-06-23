@@ -36,7 +36,6 @@ namespace LuongChiHai_QLSV.Server.Models
         [Column("BirthPlace")]
         public string BirthPlace { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(12)] // Khớp CHAR(12)
         [Column("CitizenID")]
         public string CitizenID { get; set; } = string.Empty;
@@ -50,12 +49,10 @@ namespace LuongChiHai_QLSV.Server.Models
         [Column("CitizenIDIssuePlace")]
         public string CitizenIDIssuePlace { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(15)]
         [Column("PhoneNumber")]
         public string PhoneNumber { get; set; } = string.Empty;
 
-        [Required]
         [StringLength(100)]
         [EmailAddress] // Kiểm tra định dạng Email hợp lệ ở mức ứng dụng
         [Column("Email")]

@@ -11,13 +11,8 @@ namespace LuongChiHai_QLSV.Server.Models
         [Column("StudentID", TypeName = "varchar(15)")]
         public string StudentID { get; set; } = string.Empty;
 
-        [Required]
-        [StringLength(30)]
-        public string FileCode { get; set; } = string.Empty;
-
         public DateTime AdmissionDate { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string ClassName { get; set; } = string.Empty;
 

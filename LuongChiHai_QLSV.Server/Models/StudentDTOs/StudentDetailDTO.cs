@@ -8,7 +8,6 @@
         public string? Gender { get; set; }
 
         // Thông tin học vấn (Hút từ AcademicProfile)
-        public string FileCode { get; set; } = string.Empty;
         public DateTime AdmissionDate { get; set; }
         public string ClassName { get; set; } = string.Empty;
         public string CampusName { get; set; } = string.Empty;

@@ -90,7 +90,6 @@ public class StudentsController : ControllerBase
         // 2. Gán thông tin từ bảng AcademicProfile (nếu có)
         if (academic != null)
         {
-            detailDto.FileCode = academic.FileCode;
             detailDto.AdmissionDate = academic.AdmissionDate;
             detailDto.ClassName = academic.ClassName;
             detailDto.CampusName = academic.CampusName;
