@@ -19,6 +19,7 @@ export class StudentForm implements OnInit {
 
   isSubmitting = signal<boolean>(false);
   isEditMode = signal<boolean>(false);
+  isViewMode = signal<boolean>(false);
 
   studentForm = new FormGroup({
     // BỔ SUNG VALIDATION: Mã số sinh viên bắt buộc nhập, tối thiểu 5 ký tự
@@ -43,9 +44,15 @@ export class StudentForm implements OnInit {
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
+    // Kiểm tra xem URL hiện tại có chứa từ khóa 'view' hay không
+    const isViewRoute = this.router.url.includes('/view/');
 
     if (idParam) {
-      this.isEditMode.set(true);
+      if (isViewRoute) {
+        this.isViewMode.set(true); // Kích hoạt chế độ Xem chi tiết
+      } else {
+        this.isEditMode.set(true); // Kích hoạt chế độ Chỉnh sửa
+      }
 
       // XỬ LÝ KHÓA KHÓA CHÍNH: Khóa ô nhập mã số sinh viên khi ở chế độ chỉnh sửa
       this.studentForm.get('studentID')?.disable();
@@ -62,6 +69,12 @@ export class StudentForm implements OnInit {
               gender: student.gender || 'Nam',
               email: student.email || ''
             });
+
+            if (this.isViewMode()) {
+              this.studentForm.disable(); // Khóa tất cả input, select bên trong form
+            } else {
+              this.studentForm.get('studentID')?.disable(); // Chế độ sửa chỉ khóa cấu trúc ID
+            }
           }
         },
         error: (err) => console.error('Hệ thống không thể tải thông tin sinh viên:', err)

@@ -1,7 +1,11 @@
 <div class="form-container">
   <div class="form-header">
-    <h3>{{ isEditMode() ? 'Cập Nhật Thông Tin Sinh Viên' : 'Thêm Mới Sinh Viên' }}</h3>
-    <p>Vui lòng điền đầy đủ thông tin chi tiết vào các trường dữ liệu bắt buộc bên dưới.</p>
+    <h3>
+      @if (isViewMode()) { Chi Tiết Thông Tin Sinh Viên }
+      @else if (isEditMode()) { Cập Nhật Thông Tin Sinh Viên }
+      @else { Thêm Mới Sinh Viên }
+    </h3>
+    <p>Hệ thống hiển thị thông tin hồ sơ lưu trữ nội bộ của sinh viên dưới đây.</p>
   </div>
 
   <form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
@@ -75,17 +79,15 @@
     </div>
 
     <div class="form-actions">
-      <button type="button"
-              class="btn-secondary"
-              [routerLink]="['/students']">
-        Hủy Bỏ / Quay Lại
+      <button type="button" class="btn-secondary" [routerLink]="['/students']">
+        {{ isViewMode() ? 'Quay Lại Danh Sách' : 'Hủy Bỏ / Quay Lại' }}
       </button>
 
-      <button type="submit"
-              class="btn-primary"
-              [disabled]="studentForm.invalid || isSubmitting()">
-        {{ isSubmitting() ? 'Đang Lưu...' : 'Lưu Bản Ghi' }}
-      </button>
+      @if (!isViewMode()) {
+        <button type="submit" class="btn-primary" [disabled]="studentForm.invalid || isSubmitting()">
+          {{ isSubmitting() ? 'Đang Lưu...' : 'Lưu Bản Ghi' }}
+        </button>
+      }
     </div>
 
   </form>

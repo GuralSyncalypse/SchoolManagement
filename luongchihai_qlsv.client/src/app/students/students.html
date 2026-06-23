@@ -33,6 +33,9 @@
           <td class="text-muted">{{ student.email || 'Không có' }}</td>
           <td class="text-center">
             <div class="action-buttons">
+              <button class="btn btn-view" (click)="onView(student)" title="Xem">
+                <span>Xem</span>
+              </button>
               <button (click)="onUpdate(student)" class="btn btn-edit" title="Sửa">
                 ✏️ <span class="btn-text">Sửa</span>
               </button>

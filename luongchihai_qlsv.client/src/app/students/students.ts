@@ -20,6 +20,7 @@ export class Students implements OnInit {
   students = signal<Student[]>([]);
 
   ngOnInit(): void {
+    // Tải thông tin sinh viên ngay khi khởi tạo
     this.loadStudents();
   }
 
@@ -29,6 +30,10 @@ export class Students implements OnInit {
       next: (data) => this.students.set(data),
       error: (err) => console.error('Lỗi khi tải danh sách sinh viên:', err)
     });
+  }
+
+  onView(student: Student): void {
+    this.router.navigate(['/students/view', student.studentID])
   }
 
   // [CREATE] Gọi API POST: api/Students
