@@ -1,4 +1,5 @@
-﻿using LuongChiHai_QLSV.Server.Models;
+﻿using LuongChiHai_QLSV.Server.Data.Configurations;
+using LuongChiHai_QLSV.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -24,8 +25,14 @@ namespace LuongChiHai_QLSV.Server.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Áp dụng các cấu hình cho việc quản lý thông tin sinh viên
+            modelBuilder.ApplyConfiguration(new StudentConfiguration());
+            modelBuilder.ApplyConfiguration(new StudentProfileConfiguration());
+            modelBuilder.ApplyConfiguration(new AcademicProfileConfiguration());
+            modelBuilder.ApplyConfiguration(new FamilyRelationshipConfiguration());
+
             // Tự động tìm tất cả các file có kế thừa IEntityTypeConfiguration trong toàn bộ Project và nạp vào.
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            // modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
     }
 }
