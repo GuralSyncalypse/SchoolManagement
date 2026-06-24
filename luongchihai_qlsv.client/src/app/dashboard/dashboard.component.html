@@ -1,0 +1,38 @@
+<div class="dashboard-wrapper">
+  <header class="dashboard-header">
+    <h1>School Management Portal</h1>
+    <p>Welcome back! Select a section below to get started.</p>
+  </header>
+
+  <div class="dashboard-grid">
+      <!-- Card 1: Students -->
+      <div class="dashboard-card">
+          <div class="card-icon">🎓</div>
+          <h2>Students</h2>
+          <p>Manage student profiles, registrations, and academic records.</p>
+          <button [routerLink]="['/students']" class="dashboard-btn">
+              Open Student Roster →
+          </button>
+      </div>
+
+      <!-- Card 2: Courses -->
+      <div class="dashboard-card">
+          <div class="card-icon">📚</div>
+          <h2>Courses</h2>
+          <p>View available classes, curriculum tracks, and schedules.</p>
+          <button [routerLink]="['/courses']" class="dashboard-btn">
+              Manage Courses →
+          </button>
+      </div>
+
+      <!-- Card 3: Enrollments -->
+      <div class="dashboard-card">
+          <div class="card-icon">📝</div>
+          <h2>Enrollments</h2>
+          <p>Quản lý danh sách đăng ký học phần, theo dõi trạng thái và thời gian đăng ký của sinh viên.</p>
+          <button [routerLink]="['/enrollments']" class="dashboard-btn">
+              Manage Enrollments →
+          </button>
+      </div>
+  </div>
+</div>
