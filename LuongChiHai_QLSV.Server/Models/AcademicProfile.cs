@@ -11,35 +11,29 @@ namespace LuongChiHai_QLSV.Server.Models
         [Column("StudentID", TypeName = "varchar(15)")]
         public string StudentID { get; set; } = string.Empty;
 
-        public DateTime AdmissionDate { get; set; }
+        public DateTime? AdmissionDate { get; set; }
 
         [StringLength(50)]
-        public string ClassName { get; set; } = string.Empty;
+        public string? ClassName { get; set; }
 
-        [Required]
         [StringLength(100)]
-        public string CampusName { get; set; } = string.Empty;
+        public string? CampusName { get; set; }
 
-        [Required]
         [StringLength(50)]
-        public string EducationLevel { get; set; } = "Đại học";
-
-        [Required]
+        public string? EducationLevel { get; set; }
         [StringLength(50)]
-        public string EducationType { get; set; } = "Chính quy";
+        public string? EducationType { get; set; }
 
-        [Required]
         [StringLength(100)]
-        public string FacultyName { get; set; } = string.Empty;
+        public string? FacultyName { get; set; }
 
-        [Required]
         [StringLength(100)]
-        public string MajorName { get; set; } = string.Empty;
+        public string? MajorName { get; set; }
 
         [StringLength(100)]
         public string? SpecializationName { get; set; }
 
-        public int AcademicYear { get; set; }
+        public int? AcademicYear { get; set; }
 
         [Required]
         [StringLength(50)]

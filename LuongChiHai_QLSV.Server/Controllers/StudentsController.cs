@@ -1,3 +1,4 @@
+using LuongChiHai_QLSV.Server.Data;
 using LuongChiHai_QLSV.Server.Models;
 using LuongChiHai_QLSV.Server.Models.StudentDTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -90,7 +91,7 @@ public class StudentsController : ControllerBase
         // 2. Gán thông tin từ bảng AcademicProfile (nếu có)
         if (academic != null)
         {
-            detailDto.AdmissionDate = academic.AdmissionDate;
+            detailDto.AdmissionDate = academic.AdmissionDate ?? null;
             detailDto.ClassName = academic.ClassName;
             detailDto.CampusName = academic.CampusName;
             detailDto.EducationLevel = academic.EducationLevel;
@@ -105,13 +106,13 @@ public class StudentsController : ControllerBase
         // 3. Gán thông tin từ bảng StudentProfile (nếu có)
         if (profile != null)
         {
-            detailDto.BirthDate = profile.BirthDate;
+            detailDto.BirthDate = profile.BirthDate ?? null;
             detailDto.Ethnicity = profile.Ethnicity;
             detailDto.Religion = profile.Religion;
             detailDto.Nationality = profile.Nationality;
             detailDto.BirthPlace = profile.BirthPlace;
             detailDto.CitizenID = profile.CitizenID;
-            detailDto.CitizenIDIssueDate = profile.CitizenIDIssueDate;
+            detailDto.CitizenIDIssueDate = profile.CitizenIDIssueDate ?? null;
             detailDto.CitizenIDIssuePlace = profile.CitizenIDIssuePlace;
             detailDto.PhoneNumber = profile.PhoneNumber;
             detailDto.Email = profile.Email;
@@ -142,43 +143,184 @@ public class StudentsController : ControllerBase
     // PUT: api/Student/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{studentid}")]
-    public async Task<IActionResult> PutStudent(string? studentid, Student student)
+    public async Task<IActionResult> PutStudent(string studentid, [FromBody] StudentDetailDTO updateDto)
     {
-        if (studentid != student.StudentID)
-        {
-            return BadRequest();
-        }
+        if (studentid != updateDto.StudentID) return BadRequest("Mã sinh viên không khớp.");
 
-        _context.Entry(student).State = EntityState.Modified;
-
+        using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!StudentExists(studentid))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
+            // 1. Tìm các thực thể hiện tại trong DB
+            var student = await _context.Students.FindAsync(studentid);
+            var profile = await _context.StudentProfiles.FindAsync(studentid);
+            var academic = await _context.AcademicProfiles.FindAsync(studentid);
+            var family = await _context.FamilyRelationships
+                .Where(f => f.StudentID == studentid)
+                .ToListAsync();
 
-        return NoContent();
+            if (student == null || profile == null || academic == null)
+                return NotFound("Không tìm thấy hồ sơ để cập nhật.");
+
+            // 2. Cập nhật bảng Student
+            student.StudentName = updateDto.StudentName;
+            student.Gender = updateDto.Gender;
+
+            // 3. Cập nhật bảng StudentProfile
+            profile.PhoneNumber = updateDto.PhoneNumber ?? profile.PhoneNumber;
+            profile.Email = updateDto.Email ?? profile.Email;
+            profile.BirthDate = updateDto.BirthDate;
+            profile.Ethnicity = updateDto.Ethnicity;
+            profile.Religion = updateDto.Religion;
+            profile.Nationality = updateDto.Nationality;
+            profile.BirthPlace = updateDto.BirthPlace;
+            profile.CitizenID = updateDto.CitizenID;
+            profile.CitizenIDIssueDate = updateDto.CitizenIDIssueDate;
+            profile.CitizenIDIssuePlace = updateDto.CitizenIDIssuePlace;
+            profile.PermanentAddress = updateDto.PermanentAddress;
+            profile.TemporaryAddress = updateDto.TemporaryAddress;
+
+            // 4. Cập nhật bảng AcademicProfile
+            academic.Status = updateDto.Status ?? academic.Status;
+            academic.AdmissionDate = updateDto.AdmissionDate ?? academic.AdmissionDate;
+            academic.AcademicYear = updateDto.AcademicYear ?? academic.AcademicYear;
+            academic.EducationLevel = updateDto.EducationLevel ?? academic.EducationLevel;
+            academic.EducationType = updateDto.EducationType ?? academic.EducationType;
+            academic.FacultyName = updateDto.FacultyName ?? academic.FacultyName;
+            academic.MajorName = updateDto.MajorName ?? academic.MajorName;
+            academic.SpecializationName = updateDto.SpecializationName;
+            academic.CampusName = updateDto.CampusName ?? academic.CampusName;
+            academic.ClassName = updateDto.ClassName ?? academic.ClassName;
+
+            // 5. Cập nhật bảng FamilyRelationship (Logic Xóa cũ - Thêm mới)
+            // Lấy danh sách hiện có trong database của sinh viên này
+            var existingFamilyMembers = await _context.FamilyRelationships
+                .Where(f => f.StudentID == studentid)
+                .ToListAsync();
+
+            // Xóa toàn bộ dữ liệu cũ
+            _context.FamilyRelationships.RemoveRange(existingFamilyMembers);
+
+            // Thêm mới toàn bộ dữ liệu từ DTO
+            if (updateDto.FamilyRelationships != null && updateDto.FamilyRelationships.Any())
+            {
+                foreach (var memberDto in updateDto.FamilyRelationships)
+                {
+                    var newMember = new FamilyRelationship
+                    {
+                        StudentID = studentid, // Gán khóa ngoại
+                        RelativeName = memberDto.RelativeName,
+                        RelationshipType = memberDto.RelationshipType,
+                        PhoneNumber = string.IsNullOrWhiteSpace(memberDto.PhoneNumber) ? null : memberDto.PhoneNumber,
+                        BirthYear = memberDto.BirthYear
+                        // Không cần gán FamilyMemberID vì database sẽ tự sinh ID mới khi lưu
+                    };
+                    _context.FamilyRelationships.Add(newMember);
+                }
+            }
+
+            // 6. Lưu và xác nhận
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return NoContent(); // 204 No Content là chuẩn cho PUT thành công
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return StatusCode(500, $"Lỗi cập nhật hệ thống: {ex.Message}");
+        }
     }
 
     // POST: api/Student
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<Student>> PostStudent(Student student)
+    public async Task<ActionResult<StudentDetailDTO>> PostStudent([FromBody] StudentDetailDTO createDto)
     {
-        _context.Students.Add(student);
-        await _context.SaveChangesAsync();
+        if (createDto == null) return BadRequest("Dữ liệu không hợp lệ.");
 
-        return CreatedAtAction("GetStudent", new { studentid = student.StudentID }, student);
+        // Sử dụng Transaction để đảm bảo tính toàn vẹn dữ liệu
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            // 1. Kiểm tra tồn tại
+            if (await _context.Students.AnyAsync(s => s.StudentID == createDto.StudentID))
+                return BadRequest("Mã số sinh viên này đã tồn tại.");
+
+            // 2. Student chính
+            Student student = new()
+            {
+                StudentID = createDto.StudentID,
+                StudentName = createDto.StudentName,
+                Gender = createDto.Gender
+            };
+
+            // 3. StudentProfile
+            StudentProfile profile = new()
+            {
+                StudentID = student.StudentID,
+                BirthDate = createDto.BirthDate,
+                PhoneNumber = createDto.PhoneNumber,
+                Email = createDto.Email,
+                Ethnicity = createDto.Ethnicity,
+                Religion = createDto.Religion,
+                Nationality = createDto.Nationality,
+                BirthPlace = createDto.BirthPlace,
+                CitizenID = createDto.CitizenID,
+                CitizenIDIssueDate = createDto.CitizenIDIssueDate,
+                CitizenIDIssuePlace = createDto.CitizenIDIssuePlace,
+                PermanentAddress = createDto.PermanentAddress,
+                TemporaryAddress = createDto.TemporaryAddress
+            };
+
+            // 4. AcademicProfile
+            AcademicProfile academic = new()
+            {
+                StudentID = student.StudentID,
+                Status = createDto.Status ?? "Đang học",
+                AdmissionDate = createDto.AdmissionDate,
+                AcademicYear = createDto.AcademicYear,
+                EducationLevel = createDto.EducationLevel,
+                EducationType = createDto.EducationType,
+                FacultyName = createDto.FacultyName,
+                MajorName = createDto.MajorName,
+                SpecializationName = createDto.SpecializationName,
+                CampusName = createDto.CampusName,
+                ClassName = createDto.ClassName
+            };
+
+            _context.Students.Add(student);
+            _context.StudentProfiles.Add(profile);
+            _context.AcademicProfiles.Add(academic);
+
+            // 5. Cập nhật bảng FamilyRelationship (Logic Xóa cũ - Thêm mới)
+            // Thêm mới toàn bộ dữ liệu từ DTO
+            if (createDto.FamilyRelationships != null && createDto.FamilyRelationships.Any())
+            {
+                foreach (var memberDto in createDto.FamilyRelationships)
+                {
+                    var newMember = new FamilyRelationship
+                    {
+                        StudentID = student.StudentID, // Gán khóa ngoại
+                        RelativeName = memberDto.RelativeName,
+                        RelationshipType = memberDto.RelationshipType,
+                        PhoneNumber = string.IsNullOrWhiteSpace(memberDto.PhoneNumber) ? null : memberDto.PhoneNumber,
+                        BirthYear = memberDto.BirthYear
+                        // Không cần gán FamilyMemberID vì database sẽ tự sinh ID mới khi lưu
+                    };
+                    _context.FamilyRelationships.Add(newMember);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return CreatedAtAction(nameof(GetStudent), new { studentid = student.StudentID }, createDto);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
+        }
     }
 
     // DELETE: api/Student/5

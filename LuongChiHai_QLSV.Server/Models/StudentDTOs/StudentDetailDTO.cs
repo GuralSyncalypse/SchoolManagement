@@ -5,35 +5,36 @@
         // Thông tin cơ bản
         public string StudentID { get; set; } = string.Empty;
         public string StudentName { get; set; } = string.Empty;
-        public string? Gender { get; set; }
+        public string Gender { get; set; } = string.Empty;
 
-        // Thông tin học vấn (Hút từ AcademicProfile)
-        public DateTime AdmissionDate { get; set; }
-        public string ClassName { get; set; } = string.Empty;
-        public string CampusName { get; set; } = string.Empty;
-        public string EducationLevel { get; set; } = "Đại học";
-        public string EducationType { get; set; } = "Chính quy";
-        public string FacultyName { get; set; } = string.Empty;
-        public string MajorName { get; set; } = string.Empty;
+        // Thông tin học vấn
+        public DateTime? AdmissionDate { get; set; }
+        public string? ClassName { get; set; }
+        public string? CampusName { get; set; }
+        public string? EducationLevel { get; set; }
+        public string? EducationType { get; set; }
+        public string? FacultyName { get; set; }
+        public string? MajorName { get; set; }
         public string? SpecializationName { get; set; }
-        public int AcademicYear { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public int? AcademicYear { get; set; }
+        public string Status { get; set; } = "Đang học";
 
-        // Thông tin cá nhân (Hút từ StudentProfile)
-        public DateTime BirthDate { get; set; }
-        public string Ethnicity { get; set; } = string.Empty;
-        public string Religion { get; set; } = string.Empty;
-        public string Nationality { get; set; } = string.Empty;
-        public string BirthPlace { get; set; } = string.Empty;
-        public string CitizenID { get; set; } = string.Empty;
-        public DateTime CitizenIDIssueDate { get; set; }
-        public string CitizenIDIssuePlace { get; set; } = string.Empty;
+        // Thông tin cá nhân
+        public DateTime? BirthDate { get; set; }
         public string PhoneNumber { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string PermanentAddress { get; set; } = string.Empty;
-        public string TemporaryAddress { get; set; } = string.Empty;
 
-        // Danh sách người thân (Dùng kèm một DTO nhỏ cho Family)
+        public string? Ethnicity { get; set; }
+        public string? Religion { get; set; }
+        public string? Nationality { get; set; }
+        public string? BirthPlace { get; set; }
+        public string? CitizenID { get; set; }
+        public DateTime? CitizenIDIssueDate { get; set; }
+        public string? CitizenIDIssuePlace { get; set; }
+        public string? PermanentAddress { get; set; }
+        public string? TemporaryAddress { get; set; }
+
+        // Danh sách người thân
         public List<FamilyMemberDTO> FamilyRelationships { get; set; } = new List<FamilyMemberDTO>();
     }
 

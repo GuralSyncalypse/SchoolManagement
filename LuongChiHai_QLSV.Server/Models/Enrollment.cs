@@ -5,10 +5,10 @@ namespace LuongChiHai_QLSV.Server.Models
     [Table("Enrollment")]
     public class Enrollment
     {
-        public int enrollmentId { get; set; }
-        public string studentID{ get; set; } = string.Empty;
-        public int courseID { get; set; }
-        public DateTime enrollmentDate { get; set; }
+        public int EnrollmentId { get; set; }
+        public string StudentID{ get; set; } = string.Empty;
+        public int CourseID { get; set; }
+        public DateTime EnrollmentDate { get; set; }
 
 
         // Liên kết nhiều-đến-1 về bảng Student và Course

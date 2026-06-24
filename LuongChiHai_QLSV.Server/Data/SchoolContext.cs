@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LuongChiHai_QLSV.Server.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
-namespace LuongChiHai_QLSV.Server.Models
+namespace LuongChiHai_QLSV.Server.Data
 {
     public class SchoolContext : DbContext
     {
@@ -17,5 +19,13 @@ namespace LuongChiHai_QLSV.Server.Models
         public DbSet<Course> Courses { get; set; } = null!;
         public DbSet<Enrollment> Enrollments { get; set; } = null!;
         public DbSet<Score> Scores { get; set; } = null!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Tự động tìm tất cả các file có kế thừa IEntityTypeConfiguration trong toàn bộ Project và nạp vào.
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        }
     }
 }
