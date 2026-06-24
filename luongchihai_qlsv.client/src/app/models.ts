@@ -34,33 +34,33 @@ export interface StudentDetailDTO {
   gender?: string;
 
   // Thông tin học vấn (AcademicProfile)
-  admissionDate: string;  // Kiểu DATE/DateTime từ API trả về sẽ là chuỗi ISO string (vd: "2026-06-23T00:00:00")
-  className: string;
-  campusName: string;
-  educationLevel: string;
-  educationType: string;
-  facultyName: string;
-  majorName: string;
+  admissionDate?: string;  // Kiểu DATE/DateTime từ API trả về sẽ là chuỗi ISO string (vd: "2026-06-23T00:00:00")
+  className?: string;
+  campusName?: string;
+  educationLevel?: string;
+  educationType?: string;
+  facultyName?: string;
+  majorName?: string;
   specializationName?: string; // Dấu ? vì SQL cho phép NULL
-  academicYear: number;
+  academicYear?: number;
   status: string;
 
   // Thông tin cá nhân (StudentProfile)
-  birthDate: string;
-  ethnicity: string;
-  religion: string;
-  nationality: string;
-  birthPlace: string;
-  citizenID: string;
-  citizenIDIssueDate: string;
-  citizenIDIssuePlace: string;
+  birthDate?: string;
+  ethnicity?: string;
+  religion?: string;
+  nationality?: string;
+  birthPlace?: string;
+  citizenID?: string;
+  citizenIDIssueDate?: string;
+  citizenIDIssuePlace?: string;
   phoneNumber: string;
   email: string;
-  permanentAddress: string;
-  temporaryAddress: string;
+  permanentAddress?: string;
+  temporaryAddress?: string;
 
   // Mối quan hệ 1 - Nhiều (Danh sách người thân)
-  familyRelationships: FamilyMemberDTO[];
+  familyRelationships?: FamilyMemberDTO[];
 }
 
 export interface Course {

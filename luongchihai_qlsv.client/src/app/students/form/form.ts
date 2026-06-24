@@ -1,8 +1,8 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, FormControl, Validators, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { StudentDetailDTO } from '../../models';
+import { StudentDetailDTO, FamilyMemberDTO } from '../../models';
 import { StudentService } from '../students.service';
 
 @Component({
@@ -21,177 +21,148 @@ export class StudentForm implements OnInit {
   isEditMode = signal<boolean>(false);
   isViewMode = signal<boolean>(false);
 
-  // Định nghĩa FormGroup chứa toàn bộ thông tin phẳng của StudentDetailDTO
-  studentForm = new FormGroup({
-    // ==========================================
-    // 👤 NHÓM THÔNG TIN CƠ BẢN (BẮT BUỘC PHẢI CÓ)
-    // ==========================================
-    studentID: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.minLength(5)] }),
-    studentName: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
-    gender: new FormControl<string>('Nam', { nonNullable: true }), // Mặc định là Nam, không sợ trống
-    birthDate: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
-    phoneNumber: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
-    email: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
-
-    // ==========================================
-    // 🎓 NHÓM THÔNG TIN HỌC VẤN (BỔ SUNG SAU - KHÔNG validator)
-    // ==========================================
-    className: new FormControl<string>('', { nonNullable: true }),
-    status: new FormControl<string>('Đang học', { nonNullable: true }),
-    facultyName: new FormControl<string>('', { nonNullable: true }),
-    majorName: new FormControl<string>('', { nonNullable: true }),
-    specializationName: new FormControl<string>('', { nonNullable: true }),
-    educationLevel: new FormControl<string>('Đại học', { nonNullable: true }),
-    educationType: new FormControl<string>('Chính quy', { nonNullable: true }),
-    academicYear: new FormControl<number>(new Date().getFullYear(), { nonNullable: true }),
-    admissionDate: new FormControl<string>('', { nonNullable: true }),
-    campusName: new FormControl<string>('', { nonNullable: true }),
-
-    // ==========================================
-    // 📝 NHÓM THÔNG TIN ĐỊNH DANH (BỔ SUNG SAU - KHÔNG validator)
-    // ==========================================
-    birthPlace: new FormControl<string>('', { nonNullable: true }),
-    citizenID: new FormControl<string>('', { nonNullable: true, validators: [Validators.maxLength(12)] }), // Chỉ check nếu có gõ
-    citizenIDIssueDate: new FormControl<string>('', { nonNullable: true }),
-    citizenIDIssuePlace: new FormControl<string>('', { nonNullable: true }),
-    ethnicity: new FormControl<string>('Kinh', { nonNullable: true }),
-    religion: new FormControl<string>('Không', { nonNullable: true }),
-    nationality: new FormControl<string>('Việt Nam', { nonNullable: true }),
-    permanentAddress: new FormControl<string>('', { nonNullable: true }),
-    temporaryAddress: new FormControl<string>('', { nonNullable: true })
-  });
+  // Định nghĩa form theo 4 khối logic
+  studentForm!: FormGroup;
 
   ngOnInit(): void {
+    this.initForm();
+
     const idParam = this.route.snapshot.paramMap.get('id');
-    const isViewRoute = this.router.url.includes('/view/');
-
     if (idParam) {
-      if (isViewRoute) {
-        this.isViewMode.set(true);
-      } else {
-        this.isEditMode.set(true);
-      }
-
-      this.studentForm.get('studentID')?.disable();
+      this.isViewMode.set(this.router.url.includes('/view/'));
+      this.isEditMode.set(!this.isViewMode());
+      this.studentForm.get('student.studentID')?.disable();
 
       this.studentService.getStudentById(idParam).subscribe({
-        next: (student) => {
-          if (student) {
-            // Định dạng chuỗi ngày YYYY-MM-DD để hiển thị chuẩn trên thẻ <input type="date">
-            const fmtBirthDate = student.birthDate ? student.birthDate.substring(0, 10) : '';
-            const fmtAdmissionDate = student.admissionDate ? student.admissionDate.substring(0, 10) : '';
-            const fmtCitizenDate = student.citizenIDIssueDate ? student.citizenIDIssueDate.substring(0, 10) : '';
-
-            // Đổ toàn bộ dữ liệu nhận từ DTO vào Form
-            this.studentForm.patchValue({
-              studentID: student.studentID,
-              studentName: student.studentName,
-              gender: student.gender || 'Nam',
-
-              admissionDate: fmtAdmissionDate,
-              className: student.className,
-              campusName: student.campusName,
-              educationLevel: student.educationLevel,
-              educationType: student.educationType,
-              facultyName: student.facultyName,
-              majorName: student.majorName,
-              specializationName: student.specializationName || '',
-              academicYear: student.academicYear,
-              status: student.status,
-
-              birthDate: fmtBirthDate,
-              ethnicity: student.ethnicity,
-              religion: student.religion,
-              nationality: student.nationality,
-              birthPlace: student.birthPlace,
-              citizenID: student.citizenID,
-              citizenIDIssueDate: fmtCitizenDate,
-              citizenIDIssuePlace: student.citizenIDIssuePlace,
-              phoneNumber: student.phoneNumber,
-              email: student.email,
-              permanentAddress: student.permanentAddress,
-              temporaryAddress: student.temporaryAddress
-            });
-
-            if (this.isViewMode()) {
-              this.studentForm.disable(); // Xem chi tiết: Khóa tất cả các ô nhập liệu
-            } else {
-              this.studentForm.get('studentID')?.disable(); // Chỉnh sửa: Chỉ khóa Mã SV
-            }
-          }
-        },
-        error: (err) => console.error('Hệ thống không thể tải thông tin sinh viên:', err)
+        next: (student) => this.patchStudentData(student),
+        error: (err) => console.error('Lỗi tải dữ liệu:', err)
       });
     }
   }
 
+  private createFamilyGroup(member?: FamilyMemberDTO): FormGroup {
+    return new FormGroup({
+      familyMemberID: new FormControl(member?.familyMemberID || 0),
+      relativeName: new FormControl(member?.relativeName || '', Validators.required),
+      relationshipType: new FormControl(member?.relationshipType || '', Validators.required),
+      phoneNumber: new FormControl(member?.phoneNumber || '', ),
+      birthYear: new FormControl(member?.birthYear || new Date().getFullYear(), Validators.required)
+    });
+  }
+
+  private initForm(): void {
+      this.studentForm = new FormGroup({
+        student: new FormGroup({
+          studentID: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(5)] }),
+          studentName: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
+          gender: new FormControl('Nam', { nonNullable: true, validators: Validators.required })
+        }),
+      profile: new FormGroup({
+        birthDate: new FormControl('', { nonNullable: true}),
+        birthPlace: new FormControl(''),
+        ethnicity: new FormControl('Kinh'),
+        religion: new FormControl('Không'),
+        nationality: new FormControl('Việt Nam'),
+        citizenID: new FormControl('', [Validators.maxLength(12)]),
+        citizenIDIssueDate: new FormControl(''),
+        citizenIDIssuePlace: new FormControl(''),
+        phoneNumber: new FormControl('', { nonNullable: false, validators: Validators.required }),
+        email: new FormControl('', { nonNullable: false, validators: Validators.required }),
+        permanentAddress: new FormControl(''),
+        temporaryAddress: new FormControl('')
+      }),
+      academic: new FormGroup({
+        className: new FormControl(''),
+        status: new FormControl('Đang học'),
+        facultyName: new FormControl(''),
+        majorName: new FormControl(''),
+        specializationName: new FormControl(''),
+        educationLevel: new FormControl('Đại học'),
+        educationType: new FormControl('Chính quy'),
+        academicYear: new FormControl(new Date().getFullYear()),
+        admissionDate: new FormControl(''),
+        campusName: new FormControl('')
+      }),
+      familyRelationships: new FormArray([])
+    });
+  }
+
+  private patchStudentData(s: StudentDetailDTO): void {
+    // 1. Patch các group đơn lẻ
+    this.studentForm.patchValue({
+      student: { studentID: s.studentID, studentName: s.studentName, gender: s.gender || 'Nam' },
+      profile: { ...s, birthDate: s.birthDate?.toString().substring(0, 10), citizenIDIssueDate: s.citizenIDIssueDate?.toString().substring(0, 10) },
+      academic: { ...s }
+    });
+
+    // 2. Xử lý Family Array
+    this.familyArray.clear(); // Quan trọng: Xóa dữ liệu cũ trước khi push mới
+    if (s.familyRelationships && s.familyRelationships.length > 0) {
+      s.familyRelationships.forEach(member => {
+        this.familyArray.push(this.createFamilyGroup(member));
+      });
+    }
+  }
+
+  get familyArray(): FormArray {
+    return this.studentForm.get('familyRelationships') as FormArray;
+  }
+
+  addFamilyMember(): void {
+    this.familyArray.push(this.createFamilyGroup());
+  }
+
+  // Xóa dòng theo index
+  removeFamilyMember(index: number): void {
+    this.familyArray.removeAt(index);
+  }
+
   onSubmit(): void {
+    console.log("Đã nhấn nút lưu, form hiện tại:", this.studentForm.value); // Thêm dòng này
     if (this.studentForm.invalid) {
+      console.warn("Form không hợp lệ:", this.studentForm.errors);
       this.studentForm.markAllAsTouched();
       return;
     }
 
     this.isSubmitting.set(true);
+    const raw = this.studentForm.getRawValue();
 
-    // Lấy toàn bộ giá trị (Kể cả các trường bị disabled)
-    const rawData = this.studentForm.getRawValue();
-
-    // Map chuẩn xác từng trường tương ứng với cấu trúc StudentDetailDTO
+    // Gom phẳng dữ liệu thành StudentDetailDTO
     const studentData: StudentDetailDTO = {
-      studentID: rawData.studentID,
-      studentName: rawData.studentName,
-      gender: rawData.gender,
+      ...raw.student,
+      ...raw.profile,
+      ...raw.academic,
 
-      admissionDate: rawData.admissionDate,
-      className: rawData.className,
-      campusName: rawData.campusName,
-      educationLevel: rawData.educationLevel,
-      educationType: rawData.educationType,
-      facultyName: rawData.facultyName,
-      majorName: rawData.majorName,
-      specializationName: rawData.specializationName || undefined,
-      academicYear: Number(rawData.academicYear),
-      status: rawData.status,
+      // Ép kiểu
+      phoneNumber: raw.profile.phoneNumber || null,
+      birthDate: raw.profile.birthDate || null,
+      birthPlace: raw.profile.birthPlace || null,
+      citizenID: raw.profile.citizenID || null,
+      citizenIDIssueDate: raw.profile.citizenIDIssueDate || null,
+      citizenIDIssuePlace: raw.profile.citizenIDIssuePlace || null,
+      permanentAddress: raw.profile.permanentAddress || null,
+      temporaryAddress: raw.profile.temporaryAddress || null,
+      admissionDate: raw.academic.admissionDate || null,
 
-      birthDate: rawData.birthDate,
-      ethnicity: rawData.ethnicity,
-      religion: rawData.religion,
-      nationality: rawData.nationality,
-      birthPlace: rawData.birthPlace,
-      citizenID: rawData.citizenID,
-      citizenIDIssueDate: rawData.citizenIDIssueDate,
-      citizenIDIssuePlace: rawData.citizenIDIssuePlace,
-      phoneNumber: rawData.phoneNumber,
-      email: rawData.email,
-      permanentAddress: rawData.permanentAddress,
-      temporaryAddress: rawData.temporaryAddress,
-
-      // Tạm thời khởi tạo mảng rỗng cho phần người thân (Family Relationship) 
-      // để khớp interface, bạn có thể thiết lập FormArray xử lý phần này sau.
-      familyRelationships: []
+      familyRelationships: raw.familyRelationships // Lấy mảng từ FormArray
     };
 
-    if (this.isEditMode()) {
-      this.studentService.updateStudent(studentData.studentID, studentData).subscribe({
-        next: () => {
-          alert('Hệ thống đã cập nhật thông tin sinh viên thành công.');
-          this.router.navigate(['/students']);
-        },
-        error: (err) => this.handleError(err)
-      });
-    } else {
-      this.studentService.createStudent(studentData).subscribe({
-        next: () => {
-          alert('Hệ thống đã ghi nhận và lưu trữ thông tin sinh viên thành công.');
-          this.router.navigate(['/students']);
-        },
-        error: (err) => this.handleError(err)
-      });
-    }
+    const action = this.isEditMode()
+      ? this.studentService.updateStudent(studentData.studentID, studentData)
+      : this.studentService.createStudent(studentData);
+
+    action.subscribe({
+      next: () => {
+        alert('Thành công!');
+        this.router.navigate(['/students']);
+      },
+      error: (err) => this.handleError(err)
+    });
   }
 
   private handleError(err: any): void {
-    alert('Lỗi hệ thống: ' + (err.error?.message || 'Không thể hoàn tất thao tác.'));
+    alert('Lỗi: ' + (err.error?.message || 'Có lỗi xảy ra'));
     this.isSubmitting.set(false);
   }
 }
