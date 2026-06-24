@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LuongChiHai_QLSV.Server.Models;
+using LuongChiHai_QLSV.Server.Data;
 
 [Route("api/[controller]")]
 [ApiController]

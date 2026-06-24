@@ -1,4 +1,4 @@
-using LuongChiHai_QLSV.Server.Models;
+using LuongChiHai_QLSV.Server.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

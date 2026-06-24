@@ -14,6 +14,7 @@ const routes: Routes = [
   { path: 'students', component: Students },
   { path: 'students/create', component: StudentForm },
   { path: 'students/edit/:id', component: StudentForm },
+  { path: 'students/view/:id', component: StudentForm },
   { path: 'courses', component: Courses },
   { path: 'courses/create', component: CourseForm },
   { path: 'courses/edit/:id', component: CourseForm },

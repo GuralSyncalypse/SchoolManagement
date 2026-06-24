@@ -13,9 +13,11 @@
         <tr>
           <th>Mã SV</th>
           <th>Tên Sinh Viên</th>
-          <th>Ngày Sinh</th>
           <th>Giới Tính</th>
-          <th>Email</th>
+          <th>Lớp Học</th>
+          <th>Ngành Học</th>
+          <th>Số Điện Thoại</th>
+          <th>Trạng Thái</th>
           <th class="text-center">Hành động</th>
         </tr>
       </thead>
@@ -24,15 +26,25 @@
         <tr>
           <td><span class="badge-id">{{ student.studentID }}</span></td>
           <td class="font-semibold">{{ student.studentName }}</td>
-          <td>{{ student.birthDate | date:'dd/MM/yyyy' }}</td>
           <td>
             <span class="badge-gender" [class.male]="student.gender === 'Nam'" [class.female]="student.gender === 'Nữ'">
               {{ student.gender || 'Chưa rõ' }}
             </span>
           </td>
-          <td class="text-muted">{{ student.email || 'Không có' }}</td>
+          <td>{{ student.className || 'Chưa xếp lớp' }}</td>
+          <td>{{ student.majorName }}</td>
+          <td class="text-muted">{{ student.phoneNumber }}</td>
+          <td>
+            <span class="badge-status" [attr.data-status]="student.status">
+              {{ student.status }}
+            </span>
+          </td>
+
           <td class="text-center">
             <div class="action-buttons">
+              <button class="btn btn-view" (click)="onView(student)" title="Xem">
+                <span>Xem</span>
+              </button>
               <button (click)="onUpdate(student)" class="btn btn-edit" title="Sửa">
                 ✏️ <span class="btn-text">Sửa</span>
               </button>

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Student } from '../models';
+import { StudentListDTO, StudentDetailDTO } from '../models';
 
 
 @Injectable({
@@ -14,22 +14,22 @@ export class StudentService {
   private apiUrl = '/api/students';
 
   // GET: api/Students (GetStudent trong Controller)
-  getStudents(): Observable<Student[]> {
-    return this.http.get<Student[]>(this.apiUrl);
+  getStudents(): Observable<StudentListDTO[]> {
+    return this.http.get<StudentListDTO[]>(this.apiUrl);
   }
 
   // GET: api/Students/{id}
-  getStudentById(id: string): Observable<Student> {
-    return this.http.get<Student>(`${this.apiUrl}/${id}`);
+  getStudentById(id: string): Observable<StudentDetailDTO> {
+    return this.http.get<StudentDetailDTO>(`${this.apiUrl}/${id}`);
   }
 
   // POST: api/Students (PostStudent trong Controller)
-  createStudent(student: Student): Observable<Student> {
-    return this.http.post<Student>(this.apiUrl, student);
+  createStudent(student: StudentDetailDTO): Observable<StudentDetailDTO> {
+    return this.http.post<StudentDetailDTO>(this.apiUrl, student);
   }
 
   // PUT: api/Students/{id} (PutStudent trong Controller)
-  updateStudent(id: string, student: Student): Observable<any> {
+  updateStudent(id: string, student: StudentDetailDTO): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, student);
   }
 
