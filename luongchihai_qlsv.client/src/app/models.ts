@@ -1,9 +1,23 @@
 
 export interface Enrollment {
-  enrollmentID: number;
+  // Đã bỏ enrollmentID vì dùng khóa chính kép (studentID + courseID)
   studentID: string;
-  courseID: string;
-  grade?: number; // Ví dụ về điểm số (có thể chưa có điểm nên dùng ?)
+  courseID: number;
+  enrollmentDate: string;
+
+  // Navigation Properties
+  scores?: Score[];
+}
+
+export interface Score {
+  scoreId: number;
+
+  // Thay thế enrollmentId bằng cặp khóa ngoại tương ứng
+  studentID: string;
+  courseID: number;
+
+  scoreType: string;    // Ví dụ: "Giữa kỳ", "Cuối kỳ"
+  scoreValue: number;   // Tương ứng với decimal trong C#
 }
 
 // 1. Interface phục vụ cho trang hiển thị DANH SÁCH (Gọn nhẹ, load nhanh)
