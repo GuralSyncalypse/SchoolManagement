@@ -10,27 +10,32 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
         {
             builder.ToTable("Enrollment");
 
-            builder.HasKey(e => e.EnrollmentId);
+            // 1. Định nghĩa Composite Key
+            builder.HasKey(e => new { e.StudentID, e.CourseID });
 
+            // 2. Cấu hình các thuộc tính
             builder.Property(e => e.StudentID)
-                   .IsRequired()
-                   .HasColumnType("varchar(15)");
+                  .HasMaxLength(15)
+                  .IsRequired();
 
             builder.Property(e => e.EnrollmentDate)
-                   .IsRequired()
-                   .HasDefaultValueSql("GETDATE()"); // Mặc định là ngày giờ hiện tại
+                  .HasDefaultValueSql("GETDATE()");
 
-            // Cấu hình quan hệ N-1 với Student
+            // 3. Quan hệ với Student và Course (Nếu chưa cấu hình ở các entity đó)
             builder.HasOne(e => e.Student)
-                   .WithMany(s => s.Enrollments)
-                   .HasForeignKey(e => e.StudentID)
-                   .OnDelete(DeleteBehavior.Restrict); // Tránh xóa Student nếu vẫn còn Enrollment
+                  .WithMany(s => s.Enrollments)
+                  .HasForeignKey(e => e.StudentID);
 
-            // Cấu hình quan hệ N-1 với Course
             builder.HasOne(e => e.Course)
-                   .WithMany(c => c.Enrollments)
-                   .HasForeignKey(e => e.CourseID)
-                   .OnDelete(DeleteBehavior.Cascade);
+                  .WithMany(c => c.Enrollments)
+                  .HasForeignKey(e => e.CourseID);
+
+            // 4. Liên kết 1-nhiều với Score
+            // Vì Enrollment có khóa chính kép, Score cần ngoại khóa tương ứng
+            builder.HasMany(e => e.Scores)
+                  .WithOne(s => s.Enrollment)
+                  .HasForeignKey(s => new { s.StudentID, s.CourseID })
+                  .OnDelete(DeleteBehavior.Cascade); // Xóa Enrollment sẽ xóa hết các điểm liên quan
         }
     }
 }

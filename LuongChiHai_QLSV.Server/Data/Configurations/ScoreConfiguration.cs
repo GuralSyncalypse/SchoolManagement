@@ -10,22 +10,25 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
         {
             builder.ToTable("Score");
 
-            builder.HasKey(e => e.ScoreId);
+            // 1. Khóa chính
+            builder.HasKey(s => s.ScoreId);
 
-            builder.Property(e => e.ScoreType)
-                   .IsRequired()
-                   .HasMaxLength(50);
+            // 2. Cấu hình các thuộc tính
+            builder.Property(s => s.ScoreType)
+                  .HasMaxLength(50)
+                  .IsRequired();
 
-            // Cấu hình DECIMAL(4,2)
-            builder.Property(e => e.ScoreValue)
-                   .HasColumnType("decimal(4,2)")
-                   .IsRequired();
+            // DECIMAL(4,2) trong C# dùng kiểu decimal
+            builder.Property(s => s.ScoreValue)
+                  .HasColumnType("decimal(4,2)")
+                  .IsRequired();
 
-            // Cấu hình quan hệ N-1 với Enrollment
+            // 3. Cấu hình liên kết với Enrollment (Khóa ngoại kép)
             builder.HasOne(s => s.Enrollment)
-                   .WithMany(e => e.Scores)
-                   .HasForeignKey(s => s.EnrollmentId)
-                   .OnDelete(DeleteBehavior.Cascade); // Nếu xóa Enrollment, xóa luôn các đầu điểm
+                  .WithMany(e => e.Scores)
+                  // Chỉ định rõ cặp khóa ngoại tham chiếu đến (StudentID, CourseID)
+                  .HasForeignKey(s => new { s.StudentID, s.CourseID })
+                  .OnDelete(DeleteBehavior.Cascade); // Xóa Enrollment sẽ xóa toàn bộ điểm liên quan
         }
     }
 }
