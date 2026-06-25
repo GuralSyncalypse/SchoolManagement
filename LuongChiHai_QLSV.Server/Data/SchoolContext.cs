@@ -19,7 +19,6 @@ namespace LuongChiHai_QLSV.Server.Data
         // Các bảng cũ của bạn
         public DbSet<Course> Courses { get; set; } = null!;
         public DbSet<Enrollment> Enrollments { get; set; } = null!;
-        public DbSet<Score> Scores { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,7 +35,6 @@ namespace LuongChiHai_QLSV.Server.Data
 
             // Áp dụng các cấu hình cho việc đăng ký môn
             modelBuilder.ApplyConfiguration(new EnrollmentConfiguration());
-            modelBuilder.ApplyConfiguration(new ScoreConfiguration());
 
             // Tự động tìm tất cả các file có kế thừa IEntityTypeConfiguration trong toàn bộ Project và nạp vào.
             // modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
