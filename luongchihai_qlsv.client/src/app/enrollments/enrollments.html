@@ -9,31 +9,45 @@
       <tr>
         <th>Mã Sinh viên</th>
         <th>Mã Môn học</th>
-        <th>Ngày đăng ký</th>
+        <th>Học kỳ</th>
+        <th>Điểm QT</th>
+        <th>Điểm GK</th>
+        <th>Điểm CK</th>
+        <th>Tổng kết</th>
+        <th>Trạng thái</th>
         <th class="text-center">Thao tác</th>
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let item of enrollments()">
+      @for (item of enrollments(); track item.studentID + item.courseID) {
+      <tr>
         <td>{{ item.studentID }}</td>
         <td>{{ item.courseID }}</td>
-        <td>{{ item.enrollmentDate | date:'dd/MM/yyyy' }}</td>
+        <td>{{ item.semester }}</td>
+        <td>{{ item.processScore | formatScore }}</td>
+        <td>{{ item.midtermScore | formatScore }}</td>
+        <td>{{ item.finalExamScore | formatScore }}</td>
+        <td><strong>{{ item.totalScore | formatScore }}</strong></td>
+        <td>
+          <span class="badge" [class.bg-success]="item.isPassed" [class.bg-danger]="!item.isPassed">
+            {{ item.isPassed ? 'Đạt' : 'Không đạt' }}
+          </span>
+        </td>
         <td class="text-center">
-          <button class="btn btn-sm btn-outline-warning me-2"
-                  (click)="onUpdate(item.studentID, item.courseID)">
+          <button class="btn btn-sm btn-outline-warning me-2" (click)="onUpdate(item.studentID, +item.courseID)">
             Sửa
           </button>
-
           <button class="btn btn-sm btn-outline-danger"
                   (click)="onDelete(item.studentID, item.courseID)">
             Xóa
           </button>
         </td>
       </tr>
-
-      <tr *ngIf="enrollments().length === 0">
-        <td colspan="4" class="text-center text-muted">Chưa có lượt đăng ký nào.</td>
+      } @empty {
+      <tr>
+        <td colspan="9" class="text-center text-muted">Chưa có lượt đăng ký nào.</td>
       </tr>
+      }
     </tbody>
   </table>
 </div>

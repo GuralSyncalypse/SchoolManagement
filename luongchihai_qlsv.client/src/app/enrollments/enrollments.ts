@@ -1,53 +1,60 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
-import { Enrollment } from '../models';
-import { EnrollmentService } from './enrollments.service';
+import { Router, RouterModule } from '@angular/router';
+import { EnrollmentService } from './enrollments.service'; // Adjust path
+import { EnrollmentResponse, EnrollmentRequest } from '../models';
+import { FormatScorePipe } from './format-score.pipe'
 
 @Component({
-  selector: 'app-enrollments',
+  selector: 'app-enrollment',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormatScorePipe],
   templateUrl: './enrollments.html'
 })
 export class Enrollments implements OnInit {
   private enrollmentService = inject(EnrollmentService);
-  private router = inject(Router);
+  private router = inject(Router)
 
-  enrollments = signal<Enrollment[]>([]);
+  enrollments = signal<EnrollmentResponse[]>([]);
+  isLoading = signal<boolean>(false);
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.loadEnrollments();
   }
 
-  loadEnrollments(): void {
+  loadEnrollments() {
+    this.isLoading.set(true);
     this.enrollmentService.getEnrollments().subscribe({
-      next: (data) => this.enrollments.set(data),
-      error: (err) => console.error('Lỗi khi tải danh sách đăng ký:', err)
+      next: (data) => {
+        this.enrollments.set(data);
+        this.isLoading.set(false);
+      }
     });
   }
 
-  onCreate(): void {
+  // Ensure the parameter type is flexible or explicitly handled
+  onDelete(studentID: string, courseID: string | number) {
+    // Convert courseId to number safely
+    const numericCourseID = typeof courseID === 'string' ? parseInt(courseID, 10) : courseID;
+
+    if (confirm('Are you sure you want to delete this record?')) {
+      this.enrollmentService.deleteEnrollment(studentID, numericCourseID).subscribe({
+        next: () => {
+          // Update local state signal
+          this.enrollments.update(list =>
+            list.filter(e => e.studentID !== studentID || e.courseID !== numericCourseID.toString())
+          );
+        }
+      });
+    }
+  }
+
+  onCreate() {
     this.router.navigate(['/enrollments/create']);
   }
 
-  // Cập nhật: Nhận 2 tham số thay vì 1 enrollmentID
-  onUpdate(studentId: string, courseId: number): void {
+  onUpdate(studentId: string, courseId: number) {
+    // Điều hướng kèm params (khóa kép)
     this.router.navigate(['/enrollments/edit', studentId, courseId]);
-  }
-
-  // Cập nhật: Nhận 2 tham số để xác định bản ghi cần xóa
-  onDelete(studentId: string, courseId: number): void {
-    if (confirm(`Xác nhận hủy đăng ký môn học ${courseId} của SV ${studentId}?`)) {
-      this.enrollmentService.deleteEnrollment(studentId, courseId).subscribe({
-        next: () => {
-          // Cập nhật lại signal bằng cách loại bỏ phần tử có cặp khóa trùng khớp
-          this.enrollments.update(list =>
-            list.filter(e => !(e.studentID === studentId && e.courseID === courseId))
-          );
-        },
-        error: (err) => alert('Không thể xóa lượt đăng ký.')
-      });
-    }
   }
 }

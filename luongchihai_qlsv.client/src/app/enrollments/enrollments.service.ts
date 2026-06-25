@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Enrollment } from '../models';
+import { EnrollmentResponse, EnrollmentRequest } from '../models'; // Import interface EnrollmentResponse
 
 @Injectable({ providedIn: 'root' })
 export class EnrollmentService {
@@ -9,28 +9,28 @@ export class EnrollmentService {
   private apiUrl = '/api/enrollments';
 
   // Lấy danh sách toàn bộ đăng ký
-  getEnrollments(): Observable<Enrollment[]> {
-    return this.http.get<Enrollment[]>(this.apiUrl);
+  getEnrollments(): Observable<EnrollmentResponse[]> {
+    return this.http.get<EnrollmentResponse[]>(this.apiUrl);
   }
 
   // Lấy chi tiết một đăng ký bằng khóa kép
-  getEnrollmentByIDs(studentId: string, courseId: number): Observable<Enrollment> {
-    return this.http.get<Enrollment>(`${this.apiUrl}/${studentId}/${courseId}`);
+  getEnrollmentByIDs(studentID: string, courseID: number): Observable<EnrollmentResponse> {
+    return this.http.get<EnrollmentResponse>(`${this.apiUrl}/${studentID}/${courseID}`);
   }
 
   // Thêm mới một đăng ký
-  createEnrollment(enrollment: Enrollment): Observable<Enrollment> {
-    return this.http.post<Enrollment>(this.apiUrl, enrollment);
+  createEnrollment(enrollment: EnrollmentResponse): Observable<EnrollmentResponse> {
+    return this.http.post<EnrollmentResponse>(this.apiUrl, enrollment);
   }
 
   // Cập nhật đăng ký bằng khóa kép
   // Lưu ý: Cần truyền đầy đủ tham số để API định danh đúng bản ghi cần sửa
-  updateEnrollment(studentId: string, courseId: number, enrollment: Enrollment): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${studentId}/${courseId}`, enrollment);
+  updateEnrollment(studentID: string, courseID: number, enrollment: EnrollmentRequest): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${studentID}/${courseID}`, enrollment);
   }
 
   // Xóa đăng ký bằng khóa kép
-  deleteEnrollment(studentId: string, courseId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${studentId}/${courseId}`);
+  deleteEnrollment(studentID: string, courseID: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${studentID}/${courseID}`);
   }
 }

@@ -11,8 +11,6 @@ import { StudentForm } from './students/form/form';
 import { Courses } from './courses/courses';
 import { CourseForm } from './courses/form/form';
 import { Enrollments } from './enrollments/enrollments';
-import { Scores } from './scores/scores';
-import { ScoreForm } from './scores/form/form';
 import { EnrollmentForm } from './enrollments/form/form';
 
 @NgModule({
@@ -27,9 +25,7 @@ import { EnrollmentForm } from './enrollments/form/form';
     Courses,
     CourseForm,
     Enrollments,
-    EnrollmentForm,
-    Scores,
-    ScoreForm
+    EnrollmentForm
   ],
   providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],

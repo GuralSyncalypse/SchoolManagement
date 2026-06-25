@@ -1,103 +1,66 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Enrollment } from '../../models';
+import { ActivatedRoute, Router } from '@angular/router';
 import { EnrollmentService } from '../enrollments.service';
+import { EnrollmentResponse } from '../../models';
 
 @Component({
   selector: 'app-enrollment-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  templateUrl: './form.html'
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './form.html',
+  styleUrls: ['./form.css']
 })
 export class EnrollmentForm implements OnInit {
-  private enrollmentService = inject(EnrollmentService);
+  private service = inject(EnrollmentService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
-  isSubmitting = signal<boolean>(false);
-  isEditMode = signal<boolean>(false);
+  isSubmitting = signal(false);
+  isEditMode = signal(false);
 
-  // Không còn enrollmentID, thay bằng cặp khóa chính
-  enrollmentForm = new FormGroup({
-    studentID: new FormControl<string>('', {
-      nonNullable: true,
-      validators: [Validators.required, Validators.maxLength(15)]
-    }),
-    courseID: new FormControl<number>(0, {
-      nonNullable: true,
-      validators: [Validators.required, Validators.min(1)]
-    }),
-    enrollmentDate: new FormControl<string>(new Date().toISOString().substring(0, 10), {
-      nonNullable: true,
-      validators: [Validators.required]
-    })
+  form = new FormGroup({
+    studentID: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    courseID: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    semester: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    processScore: new FormControl<number | null>(null),
+    midtermScore: new FormControl<number | null>(null),
+    finalExamScore: new FormControl<number | null>(null)
   });
 
   ngOnInit(): void {
-    // Để sửa bản ghi có khóa kép, URL cần chứa cả 2 tham số: /edit/:studentId/:courseId
-    const studentId = this.route.snapshot.paramMap.get('studentId');
-    const courseId = this.route.snapshot.paramMap.get('courseId');
+    const sId = this.route.snapshot.paramMap.get('studentId');
+    const cId = this.route.snapshot.paramMap.get('courseId');
 
-    if (studentId && courseId) {
+    if (sId && cId) {
       this.isEditMode.set(true);
-
-      // Gọi service dùng khóa kép
-      this.enrollmentService.getEnrollmentByIDs(studentId, parseInt(courseId, 10)).subscribe({
-        next: (data) => {
-          this.enrollmentForm.patchValue({
-            studentID: data.studentID,
-            courseID: data.courseID,
-            enrollmentDate: data.enrollmentDate.substring(0, 10)
-          });
-          // Disable khóa chính khi ở chế độ sửa để tránh thay đổi khóa
-          this.enrollmentForm.get('studentID')?.disable();
-          this.enrollmentForm.get('courseID')?.disable();
-        },
-        error: () => alert('Không thể tải thông tin đăng ký.')
+      this.service.getEnrollmentByIDs(sId, +cId).subscribe(data => {
+        this.form.patchValue(data);
+        this.form.controls.studentID.disable();
+        this.form.controls.courseID.disable();
       });
     }
   }
 
   onSubmit(): void {
-    if (this.enrollmentForm.invalid) {
-      this.enrollmentForm.markAllAsTouched();
-      return;
-    }
-
+    if (this.form.invalid) return;
     this.isSubmitting.set(true);
-    // getRawValue() sẽ lấy cả các field đã disable
-    const rawData = this.enrollmentForm.getRawValue();
 
-    const enrollmentData: Enrollment = {
-      studentID: rawData.studentID,
-      courseID: rawData.courseID,
-      enrollmentDate: rawData.enrollmentDate
+    const rawValue = this.form.getRawValue();
+
+    const payload = {
+      ...rawValue,
+      courseID: Number(rawValue.courseID) // Ép sang number ở đây
     };
 
-    if (this.isEditMode()) {
-      // Gọi update với 2 tham số
-      this.enrollmentService.updateEnrollment(enrollmentData.studentID, enrollmentData.courseID, enrollmentData).subscribe({
-        next: () => {
-          alert('Cập nhật đăng ký thành công.');
-          this.router.navigate(['/enrollments']);
-        },
-        error: (err) => this.handleError(err)
-      });
-    } else {
-      this.enrollmentService.createEnrollment(enrollmentData).subscribe({
-        next: () => {
-          alert('Đăng ký môn học thành công.');
-          this.router.navigate(['/enrollments']);
-        },
-        error: (err) => this.handleError(err)
-      });
-    }
-  }
+    const action$ = this.isEditMode()
+      ? this.service.updateEnrollment(payload.studentID, payload.courseID, payload)
+      : this.service.createEnrollment(rawValue);
 
-  private handleError(err: any): void {
-    alert('Lỗi hệ thống: ' + (err.error?.message || 'Không thể hoàn tất thao tác.'));
-    this.isSubmitting.set(false);
+    action$.subscribe({
+      next: () => this.router.navigate(['/enrollments']),
+      error: () => this.isSubmitting.set(false)
+    });
   }
 }

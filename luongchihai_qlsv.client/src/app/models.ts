@@ -1,23 +1,28 @@
 
-export interface Enrollment {
-  // Đã bỏ enrollmentID vì dùng khóa chính kép (studentID + courseID)
+/**
+ * DTO used when creating or updating enrollment data
+ */
+export interface EnrollmentRequest {
   studentID: string;
   courseID: number;
-  enrollmentDate: string;
-
-  // Navigation Properties
-  scores?: Score[];
+  semester: string;
+  processScore?: number | null;
+  midtermScore?: number | null;
+  finalExamScore?: number | null;
 }
 
-export interface Score {
-  scoreId: number;
-
-  // Thay thế enrollmentId bằng cặp khóa ngoại tương ứng
+/**
+ * DTO used when receiving enrollment data from the API
+ */
+export interface EnrollmentResponse {
   studentID: string;
-  courseID: number;
-
-  scoreType: string;    // Ví dụ: "Giữa kỳ", "Cuối kỳ"
-  scoreValue: number;   // Tương ứng với decimal trong C#
+  courseID: string;
+  semester: string;
+  processScore?: number | null;
+  midtermScore?: number | null;
+  finalExamScore?: number | null;
+  totalScore?: number | null;
+  isPassed?: boolean | null;
 }
 
 // 1. Interface phục vụ cho trang hiển thị DANH SÁCH (Gọn nhẹ, load nhanh)
@@ -84,6 +89,6 @@ export interface Course {
   credits?: number;
 
   // Navigation property: Danh sách các lượt đăng ký học phần của sinh viên này
-  enrollments?: Enrollment[];
+  enrollments?: EnrollmentResponse[];
 }
 

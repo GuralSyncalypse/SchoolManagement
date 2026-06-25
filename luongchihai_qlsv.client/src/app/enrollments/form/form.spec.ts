@@ -1,19 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { EnrollmentForm } from './form';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
-import { Form } from './form';
-
-describe('Form', () => {
-  let component: Form;
-  let fixture: ComponentFixture<Form>;
+describe('EnrollmentForm', () => {
+  let component: EnrollmentForm;
+  let fixture: ComponentFixture<EnrollmentForm>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [Form],
+      imports: [EnrollmentForm],
+      providers: [provideHttpClient(), provideRouter([])]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Form);
+    fixture = TestBed.createComponent(EnrollmentForm);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   it('should create', () => {

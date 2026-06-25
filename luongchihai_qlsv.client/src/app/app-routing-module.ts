@@ -6,7 +6,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { Students } from './students/students';
 import { Courses } from './courses/courses';
 import { Enrollments } from './enrollments/enrollments';
-import { Scores } from './scores/scores';
 import { CourseForm } from './courses/form/form';
 import { StudentForm } from './students/form/form';
 import { EnrollmentForm } from './enrollments/form/form';
