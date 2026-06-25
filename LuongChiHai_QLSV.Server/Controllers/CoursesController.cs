@@ -39,7 +39,7 @@ public class CoursesController : ControllerBase
     [HttpPut("{courseid}")]
     public async Task<IActionResult> PutCourse(int? courseid, Course course)
     {
-        if (courseid != course.courseID)
+        if (courseid != course.CourseID)
         {
             return BadRequest();
         }
@@ -73,7 +73,7 @@ public class CoursesController : ControllerBase
         _context.Courses.Add(course);
         await _context.SaveChangesAsync();
 
-        return CreatedAtAction("GetCourse", new { courseid = course.courseID }, course);
+        return CreatedAtAction("GetCourse", new { courseid = course.CourseID }, course);
     }
 
     // DELETE: api/Course/5
@@ -94,6 +94,6 @@ public class CoursesController : ControllerBase
 
     private bool CourseExists(int? courseid)
     {
-        return _context.Courses.Any(e => e.courseID == courseid);
+        return _context.Courses.Any(e => e.CourseID == courseid);
     }
 }

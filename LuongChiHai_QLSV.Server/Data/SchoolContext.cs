@@ -31,6 +31,9 @@ namespace LuongChiHai_QLSV.Server.Data
             modelBuilder.ApplyConfiguration(new AcademicProfileConfiguration());
             modelBuilder.ApplyConfiguration(new FamilyRelationshipConfiguration());
 
+            // Áp dụng các cấu hình cho việc quản lý môn học
+            modelBuilder.ApplyConfiguration(new CourseConfiguration());
+
             // Tự động tìm tất cả các file có kế thừa IEntityTypeConfiguration trong toàn bộ Project và nạp vào.
             // modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
