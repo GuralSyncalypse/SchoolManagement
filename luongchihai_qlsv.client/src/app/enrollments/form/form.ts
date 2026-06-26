@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EnrollmentService } from '../enrollments.service';
-import { EnrollmentResponse } from '../../models';
+import { EnrollmentRequest } from '../../models';
 
 @Component({
   selector: 'app-enrollment-form',
@@ -22,12 +22,29 @@ export class EnrollmentForm implements OnInit {
 
   form = new FormGroup({
     studentID: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    courseID: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    courseID: new FormControl<number | null>(null, { validators: [Validators.required] }),
     semester: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    processScore: new FormControl<number | null>(null),
-    midtermScore: new FormControl<number | null>(null),
-    finalExamScore: new FormControl<number | null>(null)
+
+    // Bổ sung Validator min và max vào đây
+    processScore: new FormControl<number | null>(null, [Validators.min(0), Validators.max(10)]),
+    midtermScore: new FormControl<number | null>(null, [Validators.min(0), Validators.max(10)]),
+    finalExamScore: new FormControl<number | null>(null, [Validators.min(0), Validators.max(10)])
   });
+
+  // Hàm dùng chung để tự động sửa điểm khi nhập tay quá khoảng
+  onScoreInput(controlName: 'processScore' | 'midtermScore' | 'finalExamScore'): void {
+    const control = this.form.get(controlName);
+
+    if (control && control.value !== null) {
+      let val = control.value;
+
+      if (val > 10) {
+        control.setValue(10, { emitEvent: false });
+      } else if (val < 0) {
+        control.setValue(0, { emitEvent: false });
+      }
+    }
+  }
 
   ngOnInit(): void {
     const sId = this.route.snapshot.paramMap.get('studentId');
@@ -47,20 +64,26 @@ export class EnrollmentForm implements OnInit {
     if (this.form.invalid) return;
     this.isSubmitting.set(true);
 
-    const rawValue = this.form.getRawValue();
+    // Sử dụng getRawValue để lấy cả giá trị của các trường bị disabled
+    const formData = this.form.getRawValue();
 
+    // Đảm bảo dữ liệu gửi đi sạch sẽ
     const payload = {
-      ...rawValue,
-      courseID: Number(rawValue.courseID) // Ép sang number ở đây
+      ...formData,
+      courseID: Number(formData.courseID)
     };
 
+    console.log("Submit!");
     const action$ = this.isEditMode()
       ? this.service.updateEnrollment(payload.studentID, payload.courseID, payload)
-      : this.service.createEnrollment(rawValue);
+      : this.service.createEnrollment(payload);
 
     action$.subscribe({
       next: () => this.router.navigate(['/enrollments']),
-      error: () => this.isSubmitting.set(false)
+      error: (err) => {
+        console.error(err);
+        this.isSubmitting.set(false);
+      }
     });
   }
 }

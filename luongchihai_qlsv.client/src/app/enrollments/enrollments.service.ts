@@ -25,7 +25,7 @@ export class EnrollmentService {
 
   // Cập nhật đăng ký bằng khóa kép
   // Lưu ý: Cần truyền đầy đủ tham số để API định danh đúng bản ghi cần sửa
-  updateEnrollment(studentID: string, courseID: number, enrollment: EnrollmentRequest): Observable<any> {
+  updateEnrollment(studentID: string, courseID: number, enrollment: EnrollmentResponse): Observable<any> {
     return this.http.put(`${this.apiUrl}/${studentID}/${courseID}`, enrollment);
   }
 

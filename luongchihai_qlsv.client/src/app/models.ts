@@ -16,7 +16,7 @@ export interface EnrollmentRequest {
  */
 export interface EnrollmentResponse {
   studentID: string;
-  courseID: string;
+  courseID: number;
   semester: string;
   processScore?: number | null;
   midtermScore?: number | null;

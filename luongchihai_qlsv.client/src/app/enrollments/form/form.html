@@ -11,13 +11,29 @@
     <input formControlName="courseID" class="form-control" type="number">
   </div>
 
-  <div class="row">
-    <div class="col"><label>Điểm QT</label><input formControlName="processScore" type="number" class="form-control"></div>
-    <div class="col"><label>Điểm GK</label><input formControlName="midtermScore" type="number" class="form-control"></div>
-    <div class="col"><label>Điểm CK</label><input formControlName="finalExamScore" type="number" class="form-control"></div>
+  <div class="mb-3">
+    <label>Học kỳ</label>
+    <input formControlName="semester" class="form-control">
   </div>
 
-  <button type="submit" [disabled]="isSubmitting()" class="btn btn-primary mt-3">
+  <div class="row">
+    <div class="col">
+      <label>Điểm QT</label>
+      <input formControlName="processScore" type="number" class="form-control" min="0.0" max="10.0" step="0.1" (input)="onScoreInput('processScore')">
+    </div>
+    <div class="col">
+      <label>Điểm GK</label>
+      <input formControlName="midtermScore" type="number" class="form-control" min="0.0" max="10.0" step="0.1" (input)="onScoreInput('midtermScore')">
+    </div>
+    <div class="col">
+      <label>Điểm CK</label>
+      <input formControlName="finalExamScore" type="number" class="form-control" min="0.0" max="10.0" step="0.1" (input)="onScoreInput('finalExamScore')">
+    </div>
+  </div>
+
+  <button type="submit"
+          [disabled]="isSubmitting() || form.invalid"
+          class="btn btn-primary mt-3">
     {{ isSubmitting() ? 'Đang lưu...' : 'Lưu' }}
   </button>
 </form>

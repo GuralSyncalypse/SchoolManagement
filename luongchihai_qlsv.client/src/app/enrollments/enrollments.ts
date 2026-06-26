@@ -33,18 +33,16 @@ export class Enrollments implements OnInit {
   }
 
   // Ensure the parameter type is flexible or explicitly handled
-  onDelete(studentID: string, courseID: string | number) {
-    // Convert courseId to number safely
-    const numericCourseID = typeof courseID === 'string' ? parseInt(courseID, 10) : courseID;
-
+  onDelete(studentID: string, courseID: number) {
     if (confirm('Are you sure you want to delete this record?')) {
-      this.enrollmentService.deleteEnrollment(studentID, numericCourseID).subscribe({
+      this.enrollmentService.deleteEnrollment(studentID, courseID).subscribe({
         next: () => {
-          // Update local state signal
+          // Cập nhật State trực tiếp bằng Signal
           this.enrollments.update(list =>
-            list.filter(e => e.studentID !== studentID || e.courseID !== numericCourseID.toString())
+            list.filter(e => e.studentID !== studentID || e.courseID !== courseID)
           );
-        }
+        },
+        error: (err) => console.error('Delete failed', err)
       });
     }
   }

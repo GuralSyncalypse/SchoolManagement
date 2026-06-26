@@ -22,10 +22,10 @@ namespace LuongChiHai_QLSV.Server.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EnrollmentResponseDto>>> GetEnrollments()
         {
-            var enrollments = await _context.Enrollments
+            List<EnrollmentResponseDto> enrollments = await _context.Enrollments
                 .Select(e => new EnrollmentResponseDto(
                     e.StudentID,
-                    e.CourseID.ToString(), // Chuyển đổi nếu kiểu dữ liệu khác nhau
+                    e.CourseID,
                     e.Semester,
                     e.ProcessScore,
                     e.MidtermScore,
@@ -35,12 +35,53 @@ namespace LuongChiHai_QLSV.Server.Controllers
                 ))
                 .ToListAsync();
 
+            // Trả về danh sách đã được định kiểu rõ ràng
             return Ok(enrollments);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateEnrollment([FromBody] EnrollmentRequestDto dto)
         {
+            var errors = new Dictionary<string, string[]>();
+
+            // 1. Kiểm tra Trùng khóa (Duplicate Key)
+            var isDuplicate = await _context.Enrollments
+                .AnyAsync(e => e.StudentID == dto.StudentID && e.CourseID == dto.CourseID);
+
+            if (isDuplicate)
+            {
+                errors.Add("Conflict", new[] { $"Sinh viên {dto.StudentID} đã đăng ký môn học {dto.CourseID} rồi." });
+            }
+
+            // 2. Kiểm tra Môn học
+            var courseExists = await _context.Courses.AnyAsync(c => c.CourseID == dto.CourseID);
+            if (!courseExists)
+            {
+                errors.Add("CourseID", new[] { $"Môn học với ID {dto.CourseID} không tồn tại." });
+            }
+
+            // 3. Kiểm tra Sinh viên
+            var studentExists = await _context.Students.AnyAsync(s => s.StudentID == dto.StudentID);
+            if (!studentExists)
+            {
+                errors.Add("StudentID", new[] { $"Sinh viên với ID {dto.StudentID} không tồn tại." });
+            }
+
+            // 4. HIỆU CHỈNH TẠI ĐÂY: Gom lỗi và đính kèm Trace ID của request
+            if (errors.Any())
+            {
+                var problemDetails = new ValidationProblemDetails(errors)
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "One or more validation errors occurred.",
+                    // Lấy mã TraceIdentifier tự động từ request hiện tại của hệ thống
+                    Extensions = { ["traceId"] = HttpContext.TraceIdentifier }
+                };
+
+                return BadRequest(problemDetails);
+            }
+
+            // 5. Lưu vào Database nếu mọi thứ hợp lệ
             var enrollment = new Enrollment
             {
                 StudentID = dto.StudentID,
@@ -54,7 +95,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
             _context.Enrollments.Add(enrollment);
             await _context.SaveChangesAsync();
 
-            return Ok(enrollment);
+            return Ok(dto);
         }
 
         [HttpGet("{studentId}/{courseId}")]
@@ -67,7 +108,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
 
             EnrollmentResponseDto dto = new EnrollmentResponseDto(
                 enrollment.StudentID,
-                enrollment.CourseID.ToString(),
+                enrollment.CourseID,
                 enrollment.Semester,
                 enrollment.ProcessScore,
                 enrollment.MidtermScore,
@@ -96,7 +137,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
             enrollment.ProcessScore = dto.ProcessScore;
             enrollment.MidtermScore = dto.MidtermScore;
             enrollment.FinalExamScore = dto.FinalExamScore;
-            // Không cập nhật StudentID và CourseID vì đây là khóa chính
+    
 
             // 3. Lưu thay đổi
             try
