@@ -27,9 +27,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
                 .Select(e => new EnrollmentResponseDto(
                     e.EnrollmentID,
                     e.StudentID,
-                    e.CourseID,
-                    e.AcademicYear,
-                    e.Semester,
+                    e.OfferingID,
                     e.ProcessScore,
                     e.MidtermScore,
                     e.FinalExamScore,
@@ -49,18 +47,18 @@ namespace LuongChiHai_QLSV.Server.Controllers
 
             // 1. Kiểm tra Trùng khóa (Duplicate Key)
             var isDuplicate = await _context.Enrollments
-                .AnyAsync(e => e.StudentID == dto.StudentID && e.CourseID == dto.CourseID && e.AcademicYear == dto.AcademicYear && e.Semester == dto.Semester);
+                .AnyAsync(e => e.StudentID == dto.StudentID && e.OfferingID == dto.OfferingID);
 
             if (isDuplicate)
             {
-                errors.Add("Conflict", new[] { $"Sinh viên {dto.StudentID} đã đăng ký môn học {dto.CourseID} trong học kỳ {dto.Semester} của năm {dto.AcademicYear} rồi." });
+                errors.Add("Conflict", new[] { $"Sinh viên {dto.StudentID} đã đăng ký với mã môn học {dto.OfferingID} trong học kỳ rồi." });
             }
 
             // 2. Kiểm tra Môn học
-            var courseExists = await _context.Courses.AnyAsync(c => c.CourseID == dto.CourseID);
+            var courseExists = await _context.CourseOfferings.AnyAsync(c => c.OfferingID == dto.OfferingID);
             if (!courseExists)
             {
-                errors.Add("CourseID", new[] { $"Môn học với ID {dto.CourseID} không tồn tại." });
+                errors.Add("OfferingID", new[] { $"Môn học với ID {dto.OfferingID} không tồn tại." });
             }
 
             // 3. Kiểm tra Sinh viên
@@ -70,10 +68,6 @@ namespace LuongChiHai_QLSV.Server.Controllers
                 errors.Add("StudentID", new[] { $"Sinh viên với ID {dto.StudentID} không tồn tại." });
             }
 
-            if (dto.AcademicYear < 2000 || dto.AcademicYear > DateTime.Now.Year + 5)
-            {
-                errors.Add("StudentID", new[] { $"Năm học {dto.AcademicYear} không hợp lệ" });
-            }
 
             // 4. HIỆU CHỈNH TẠI ĐÂY: Gom lỗi và đính kèm Trace ID của request
             if (errors.Any())
@@ -93,9 +87,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
             var enrollment = new Enrollment
             {
                 StudentID = dto.StudentID,
-                CourseID = dto.CourseID,
-                AcademicYear = dto.AcademicYear,
-                Semester = dto.Semester,
+                OfferingID = dto.OfferingID,
                 ProcessScore = dto.ProcessScore,
                 MidtermScore = dto.MidtermScore,
                 FinalExamScore = dto.FinalExamScore
@@ -118,9 +110,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
             EnrollmentResponseDto dto = new EnrollmentResponseDto(
                 enrollment.EnrollmentID,
                 enrollment.StudentID,
-                enrollment.CourseID,
-                enrollment.AcademicYear,
-                enrollment.Semester,
+                enrollment.OfferingID,
                 enrollment.ProcessScore,
                 enrollment.MidtermScore,
                 enrollment.FinalExamScore,
@@ -144,8 +134,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
             }
 
             // 2. Cập nhật các thuộc tính
-            enrollment.AcademicYear = dto.AcademicYear;
-            enrollment.Semester = dto.Semester;
+            enrollment.OfferingID = dto.OfferingID;
             enrollment.ProcessScore = dto.ProcessScore;
             enrollment.MidtermScore = dto.MidtermScore;
             enrollment.FinalExamScore = dto.FinalExamScore;

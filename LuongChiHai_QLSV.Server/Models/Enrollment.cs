@@ -7,9 +7,7 @@ namespace LuongChiHai_QLSV.Server.Models
     {
         public int EnrollmentID { get; set; }
         public string StudentID { get; set; } = null!;
-        public int CourseID { get; set; }
-        public int AcademicYear { get; set; }
-        public int Semester { get; set; }
+        public int OfferingID { get; set; }
 
         // Điểm thành phần
         public decimal? ProcessScore { get; set; }
@@ -27,6 +25,6 @@ namespace LuongChiHai_QLSV.Server.Models
 
         // Navigation Properties
         public Student Student { get; set; } = null!;
-        public Course Course { get; set; } = null!;
+        public CourseOffering Offering { get; set; } = null!;
     }
 }

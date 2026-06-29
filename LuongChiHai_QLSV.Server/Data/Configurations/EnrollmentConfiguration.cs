@@ -25,9 +25,7 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
             builder.HasIndex(e => new
             {
                 e.StudentID,
-                e.CourseID,
-                e.AcademicYear,
-                e.Semester
+                e.OfferingID
             })
             .IsUnique();
 
@@ -38,13 +36,7 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
                    .IsRequired()
                    .HasMaxLength(15);
 
-            builder.Property(e => e.CourseID)
-                   .IsRequired();
-
-            builder.Property(e => e.AcademicYear)
-                   .IsRequired();
-
-            builder.Property(e => e.Semester)
+            builder.Property(e => e.OfferingID)
                    .IsRequired();
 
             builder.Property(e => e.ProcessScore)
@@ -97,10 +89,6 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
             // =========================
             builder.ToTable(t =>
             {
-                t.HasCheckConstraint(
-                    "CHK_Enrollment_Semester",
-                    "[Semester] >= 1 AND [Semester] <= 3");
-
                 t.HasCheckConstraint(
                     "CHK_Enrollment_ProcessScore",
                     "[ProcessScore] IS NULL OR ([ProcessScore] >= 0 AND [ProcessScore] <= 10)");

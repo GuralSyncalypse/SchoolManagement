@@ -8,13 +8,7 @@ namespace LuongChiHai_QLSV.Server.Models.DTOs
         string StudentID,
 
         [Required(ErrorMessage = "Mã môn học không được để trống")]
-        int CourseID,
-
-        [Required(ErrorMessage = "Năm học không được để trống")]
-        int AcademicYear,
-
-        [Range(1, 3, ErrorMessage = "Học kỳ phải từ 1 đến 3")]
-        int Semester,
+        int OfferingID,
 
         [Range(0.0, 10.0, ErrorMessage = "Điểm quá trình phải từ 0.0 đến 10.0")]
         decimal? ProcessScore,
@@ -30,16 +24,11 @@ namespace LuongChiHai_QLSV.Server.Models.DTOs
     public record EnrollmentResponseDto(
         int EnrollmentID,
         string StudentID,
-        int CourseID,
-        int AcademicYear,
-        int Semester,
+        int OfferingID,
         decimal? ProcessScore,
         decimal? MidtermScore,
         decimal? FinalExamScore,
         decimal? TotalScore,
         bool? IsPassed
-    ) {
-        // Thuộc tính tính toán để hiển thị ra UI
-        public string SemesterDisplay => $"HK{Semester}-{AcademicYear}-{AcademicYear + 1}";
-    }
+    );
 }
