@@ -110,6 +110,9 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
                    .WithMany(s => s.Enrollments)
                    .HasForeignKey(e => e.StudentID)
                    .OnDelete(DeleteBehavior.Restrict);
+
+            builder.ToTable(e => e.HasTrigger("trg_Enrollment_Delete"));
+            builder.ToTable(e => e.HasTrigger("TR_Enrollment_AfterInsert"));
         }
     }
 }

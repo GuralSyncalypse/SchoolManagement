@@ -1,9 +1,11 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EnrollmentService } from '../enrollments.service';
 import { EnrollmentRequest } from '../../models';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs'; // Đảm bảo đã import
 
 @Component({
@@ -14,6 +16,7 @@ import { Observable } from 'rxjs'; // Đảm bảo đã import
   styleUrls: ['./form.css']
 })
 export class EnrollmentForm implements OnInit {
+  private http = inject(HttpClient);
   private service = inject(EnrollmentService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -22,13 +25,19 @@ export class EnrollmentForm implements OnInit {
   isEditMode = signal(false);
   currentEnrollmentID = signal<number | null>(null); // Lưu ID để dùng khi Update
 
-  // Trong class EnrollmentForm
-  academicYears = [new Date().getFullYear()]; // Nếu bạn muốn chọn nhiều năm, có thể tạo hàm generate danh sách năm
-  semesters = [
-    { id: 1, label: 'Học kỳ 1' },
-    { id: 2, label: 'Học kỳ 2' },
-    { id: 3, label: 'Học kỳ Hè' }
-  ];
+  offerings: any[] = [];
+
+  loadOfferings(studentId: string) {
+    const params = new HttpParams()
+      .set('studentId', studentId)
+      .set('yearId', 1)
+      .set('typeId', 1);
+
+    this.http.get<any[]>('/api/courseofferings/available', { params })
+      .subscribe(data => {
+        this.offerings = data;
+      });
+  }
 
   form = new FormGroup({
     enrollmentID: new FormControl<number>(0), // Thêm ID vào form
@@ -64,21 +73,40 @@ export class EnrollmentForm implements OnInit {
   }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id'); // Lấy ID từ URL: /edit/:id
+    const id = this.route.snapshot.paramMap.get('id');
 
-    if (id) {
-      this.isEditMode.set(true);
-      this.currentEnrollmentID.set(+id);
+    // Chế độ thêm mới
+    if (!id) {
+      this.form.controls.studentID.valueChanges
+        .pipe(
+          debounceTime(500),
+          distinctUntilChanged()
+        )
+        .subscribe(studentId => {
+          if (studentId?.trim()) {
+            this.loadOfferings(studentId);
+          } else {
+            this.offerings = [];
+          }
+        });
 
-      this.service.getEnrollment(+id).subscribe(data => {
-        this.form.patchValue(data);
-        academicYear: new Date().getFullYear()
-
-        // Có thể disable các trường khóa nếu không muốn cho sửa
-        this.form.controls.studentID.disable();
-        this.form.controls.offeringID.disable();
-      });
+      return;
     }
+
+    // Chế độ chỉnh sửa
+    this.isEditMode.set(true);
+    this.currentEnrollmentID.set(+id);
+
+    this.service.getEnrollment(+id).subscribe(data => {
+      this.form.patchValue(data);
+
+      // Tải danh sách học phần theo đúng sinh viên
+      this.loadOfferings(data.studentID);
+
+      // Khóa các trường không cho sửa
+      this.form.controls.studentID.disable();
+      this.form.controls.offeringID.disable();
+    });
   }
 
   onSubmit(): void {

@@ -7,8 +7,16 @@
       <input formControlName="studentID" class="form-control" [class.is-invalid]="form.controls.studentID.invalid && form.controls.studentID.touched">
     </div>
     <div class="col-md-6 mb-3">
-      <label class="form-label">Mã Môn học</label>
-      <input formControlName="offeringID" class="form-control" type="number" [class.is-invalid]="form.controls.offeringID.invalid && form.controls.offeringID.touched">
+      <label class="form-label">Chọn học phần</label>
+      <select formControlName="offeringID" class="form-select"
+              [class.is-invalid]="form.controls.offeringID.invalid && form.controls.offeringID.touched">
+        <option value="" disabled selected>-- Chọn môn học --</option>
+        @for (item of offerings; track item.offeringID) {
+        <option [value]="item.offeringID">
+          {{ item.courseName }} (Sĩ số: {{ item.currentStudents }}/{{ item.maxStudents }})
+        </option>
+        }
+      </select>
     </div>
   </div>
 
