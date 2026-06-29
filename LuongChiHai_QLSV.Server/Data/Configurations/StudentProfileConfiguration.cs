@@ -57,6 +57,7 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
             // 7. Tạo unique cho Email và SĐT
             builder.HasIndex(e => e.Email).IsUnique();
             builder.HasIndex(e => e.PhoneNumber).IsUnique();
+
         }
     }
 }

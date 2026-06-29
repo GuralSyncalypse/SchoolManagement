@@ -22,6 +22,8 @@ namespace LuongChiHai_QLSV.Server.Data
         public DbSet<SemesterType> SemesterTypes { get; set; } = null!;
         public DbSet<CourseOffering> CourseOfferings { get; set; } = null!;
 
+        public DbSet<Enrollment> Enrollments { get; set; } = null!;
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

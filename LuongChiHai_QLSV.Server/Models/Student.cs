@@ -15,5 +15,6 @@ namespace LuongChiHai_QLSV.Server.Models
 
         // Mối quan hệ 1 - Nhiều
         public virtual ICollection<FamilyRelationship> FamilyRelationships { get; set; } = new List<FamilyRelationship>();
+        public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
     }
 }
