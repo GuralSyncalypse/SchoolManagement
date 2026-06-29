@@ -63,6 +63,36 @@ export interface StudentDetailDTO {
   familyRelationships?: FamilyMemberDTO[];
 }
 
+export interface AcademicYear {
+  yearID: number;
+  yearName: string;
+}
+
+export interface SemesterType {
+  typeID: number;
+  typeName: string;
+}
+
+export interface CourseOffering {
+  offeringID: number;
+
+  courseID: number;
+  yearID: number;
+  typeID: number;
+
+  instructorID?: number | null;
+
+  maxStudents?: number | null;
+  currentStudents: number;
+
+  isOpen?: boolean | null;
+
+  // Navigation (optional - chỉ dùng khi API include join)
+  course?: Course;
+  academicYear?: AcademicYear;
+  semesterType?: SemesterType;
+}
+
 export interface Course {
   courseID: number;       // Không dùng dấu ? vì đây là Khoá chính (Primary Key)
   courseName: string;
@@ -70,6 +100,6 @@ export interface Course {
   credits?: number;
 
   // Navigation property: Danh sách các lượt đăng ký học phần của sinh viên này
-  enrollments?: Enrollment[];
+  courseOferrings?: CourseOffering[];
 }
 
