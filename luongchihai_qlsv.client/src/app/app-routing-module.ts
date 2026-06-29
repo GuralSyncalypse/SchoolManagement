@@ -22,7 +22,7 @@ const routes: Routes = [
   { path: 'courses/edit/:id', component: CourseForm },
   { path: 'enrollments', component: Enrollments },
   { path: 'enrollments/create', component: EnrollmentForm },
-  { path: 'enrollments/edit/:studentId/:courseId', component: EnrollmentForm },
+  { path: 'enrollments/edit/:id', component: EnrollmentForm },
   { path: '**', redirectTo: 'dashboard' }
 ];
 

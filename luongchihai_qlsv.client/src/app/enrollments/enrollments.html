@@ -10,6 +10,7 @@
         <th>Mã Sinh viên</th>
         <th>Mã Môn học</th>
         <th>Học kỳ</th>
+        <th>Năm học</th>
         <th>Điểm QT</th>
         <th>Điểm GK</th>
         <th>Điểm CK</th>
@@ -24,6 +25,7 @@
         <td>{{ item.studentID }}</td>
         <td>{{ item.courseID }}</td>
         <td>{{ item.semester }}</td>
+        <td>{{ item.academicYear }}-{{ +item.academicYear + 1 }}</td>
         <td>{{ item.processScore | formatScore }}</td>
         <td>{{ item.midtermScore | formatScore }}</td>
         <td>{{ item.finalExamScore | formatScore }}</td>
@@ -34,11 +36,11 @@
           </span>
         </td>
         <td class="text-center">
-          <button class="btn btn-sm btn-outline-warning me-2" (click)="onUpdate(item.studentID, +item.courseID)">
+          <button class="btn btn-sm btn-outline-warning me-2" (click)="onUpdate(item.enrollmentID)">
             Sửa
           </button>
           <button class="btn btn-sm btn-outline-danger"
-                  (click)="onDelete(item.studentID, item.courseID)">
+                  (click)="onDelete(item.enrollmentID)">
             Xóa
           </button>
         </td>

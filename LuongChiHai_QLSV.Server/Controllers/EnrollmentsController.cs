@@ -1,4 +1,5 @@
 ﻿using Azure;
+using Azure.Core;
 using LuongChiHai_QLSV.Server.Data;
 using LuongChiHai_QLSV.Server.Models;
 using LuongChiHai_QLSV.Server.Models.DTOs;
@@ -24,8 +25,10 @@ namespace LuongChiHai_QLSV.Server.Controllers
         {
             List<EnrollmentResponseDto> enrollments = await _context.Enrollments
                 .Select(e => new EnrollmentResponseDto(
+                    e.EnrollmentID,
                     e.StudentID,
                     e.CourseID,
+                    e.AcademicYear,
                     e.Semester,
                     e.ProcessScore,
                     e.MidtermScore,
@@ -46,11 +49,11 @@ namespace LuongChiHai_QLSV.Server.Controllers
 
             // 1. Kiểm tra Trùng khóa (Duplicate Key)
             var isDuplicate = await _context.Enrollments
-                .AnyAsync(e => e.StudentID == dto.StudentID && e.CourseID == dto.CourseID);
+                .AnyAsync(e => e.StudentID == dto.StudentID && e.CourseID == dto.CourseID && e.AcademicYear == dto.AcademicYear && e.Semester == dto.Semester);
 
             if (isDuplicate)
             {
-                errors.Add("Conflict", new[] { $"Sinh viên {dto.StudentID} đã đăng ký môn học {dto.CourseID} rồi." });
+                errors.Add("Conflict", new[] { $"Sinh viên {dto.StudentID} đã đăng ký môn học {dto.CourseID} trong học kỳ {dto.Semester} của năm {dto.AcademicYear} rồi." });
             }
 
             // 2. Kiểm tra Môn học
@@ -65,6 +68,11 @@ namespace LuongChiHai_QLSV.Server.Controllers
             if (!studentExists)
             {
                 errors.Add("StudentID", new[] { $"Sinh viên với ID {dto.StudentID} không tồn tại." });
+            }
+
+            if (dto.AcademicYear < 2000 || dto.AcademicYear > DateTime.Now.Year + 5)
+            {
+                errors.Add("StudentID", new[] { $"Năm học {dto.AcademicYear} không hợp lệ" });
             }
 
             // 4. HIỆU CHỈNH TẠI ĐÂY: Gom lỗi và đính kèm Trace ID của request
@@ -86,6 +94,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
             {
                 StudentID = dto.StudentID,
                 CourseID = dto.CourseID,
+                AcademicYear = dto.AcademicYear,
                 Semester = dto.Semester,
                 ProcessScore = dto.ProcessScore,
                 MidtermScore = dto.MidtermScore,
@@ -98,17 +107,19 @@ namespace LuongChiHai_QLSV.Server.Controllers
             return Ok(dto);
         }
 
-        [HttpGet("{studentId}/{courseId}")]
-        public async Task<ActionResult<EnrollmentResponseDto>> GetEnrollment(string studentId, int courseId)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EnrollmentResponseDto>> GetEnrollment(int id)
         {
             var enrollment = await _context.Enrollments
-                .FirstOrDefaultAsync(e => e.StudentID == studentId && e.CourseID == courseId);
+                .FirstOrDefaultAsync(e => e.EnrollmentID == id);
 
             if (enrollment == null) return NotFound();
 
             EnrollmentResponseDto dto = new EnrollmentResponseDto(
+                enrollment.EnrollmentID,
                 enrollment.StudentID,
                 enrollment.CourseID,
+                enrollment.AcademicYear,
                 enrollment.Semester,
                 enrollment.ProcessScore,
                 enrollment.MidtermScore,
@@ -121,11 +132,11 @@ namespace LuongChiHai_QLSV.Server.Controllers
             return Ok(dto);
         }
 
-        [HttpPut("{studentId}/{courseId}")]
-        public async Task<IActionResult> UpdateEnrollment(string studentId, int courseId, [FromBody] EnrollmentRequestDto dto)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateEnrollment(int id, [FromBody] EnrollmentRequestDto dto)
         {
             // 1. Tìm bản ghi dựa trên khóa chính phức hợp
-            var enrollment = await _context.Enrollments.FindAsync(studentId, courseId);
+            var enrollment = await _context.Enrollments.FindAsync(id);
 
             if (enrollment == null)
             {
@@ -133,6 +144,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
             }
 
             // 2. Cập nhật các thuộc tính
+            enrollment.AcademicYear = dto.AcademicYear;
             enrollment.Semester = dto.Semester;
             enrollment.ProcessScore = dto.ProcessScore;
             enrollment.MidtermScore = dto.MidtermScore;
@@ -153,11 +165,11 @@ namespace LuongChiHai_QLSV.Server.Controllers
         }
 
         // DELETE: api/Student/5
-        [HttpDelete("{studentId}/{courseId}")] // URL: api/enrollments/STU001/101
-        public async Task<IActionResult> DeleteEnrollment(string studentId, int courseId)
+        [HttpDelete("{id}")] // URL: api/enrollments/STU001/101
+        public async Task<IActionResult> DeleteEnrollment(int id)
         {
             // Tìm bản ghi theo khóa chính kép
-            var enrollment = await _context.Enrollments.FindAsync(studentId, courseId);
+            var enrollment = await _context.Enrollments.FindAsync(id);
 
             if (enrollment == null)
             {

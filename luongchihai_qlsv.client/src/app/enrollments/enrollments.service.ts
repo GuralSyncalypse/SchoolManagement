@@ -1,7 +1,7 @@
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { EnrollmentResponse, EnrollmentRequest } from '../models'; // Import interface EnrollmentResponse
+import { EnrollmentRequest, EnrollmentResponse } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class EnrollmentService {
@@ -13,24 +13,23 @@ export class EnrollmentService {
     return this.http.get<EnrollmentResponse[]>(this.apiUrl);
   }
 
-  // Lấy chi tiết một đăng ký bằng khóa kép
-  getEnrollmentByIDs(studentID: string, courseID: number): Observable<EnrollmentResponse> {
-    return this.http.get<EnrollmentResponse>(`${this.apiUrl}/${studentID}/${courseID}`);
+  // Lấy chi tiết một đăng ký bằng EnrollmentID (Đơn giản hơn nhiều!)
+  getEnrollment(enrollmentID: number): Observable<EnrollmentResponse> {
+    return this.http.get<EnrollmentResponse>(`${this.apiUrl}/${enrollmentID}`);
   }
 
-  // Thêm mới một đăng ký
-  createEnrollment(enrollment: EnrollmentResponse): Observable<EnrollmentResponse> {
+  // Thêm mới: Truyền EnrollmentRequest (Không chứa ID)
+  createEnrollment(enrollment: EnrollmentRequest): Observable<EnrollmentResponse> {
     return this.http.post<EnrollmentResponse>(this.apiUrl, enrollment);
   }
 
-  // Cập nhật đăng ký bằng khóa kép
-  // Lưu ý: Cần truyền đầy đủ tham số để API định danh đúng bản ghi cần sửa
-  updateEnrollment(studentID: string, courseID: number, enrollment: EnrollmentResponse): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${studentID}/${courseID}`, enrollment);
+  // Cập nhật: Chỉ cần truyền ID và DTO Update
+  updateEnrollment(enrollmentID: number, enrollment: EnrollmentRequest): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${enrollmentID}`, enrollment);
   }
 
-  // Xóa đăng ký bằng khóa kép
-  deleteEnrollment(studentID: string, courseID: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${studentID}/${courseID}`);
+  // Xóa: Chỉ cần truyền ID
+  deleteEnrollment(enrollmentID: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${enrollmentID}`);
   }
 }

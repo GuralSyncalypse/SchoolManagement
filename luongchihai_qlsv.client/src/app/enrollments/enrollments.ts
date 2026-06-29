@@ -33,13 +33,13 @@ export class Enrollments implements OnInit {
   }
 
   // Ensure the parameter type is flexible or explicitly handled
-  onDelete(studentID: string, courseID: number) {
+  onDelete(enrollmentID: number) {
     if (confirm('Are you sure you want to delete this record?')) {
-      this.enrollmentService.deleteEnrollment(studentID, courseID).subscribe({
+      this.enrollmentService.deleteEnrollment(enrollmentID).subscribe({
         next: () => {
           // Cập nhật State trực tiếp bằng Signal
           this.enrollments.update(list =>
-            list.filter(e => e.studentID !== studentID || e.courseID !== courseID)
+            list.filter(e => e.enrollmentID !== enrollmentID)
           );
         },
         error: (err) => console.error('Delete failed', err)
@@ -51,8 +51,7 @@ export class Enrollments implements OnInit {
     this.router.navigate(['/enrollments/create']);
   }
 
-  onUpdate(studentId: string, courseId: number) {
-    // Điều hướng kèm params (khóa kép)
-    this.router.navigate(['/enrollments/edit', studentId, courseId]);
+  onUpdate(enrollmentID: number) {
+    this.router.navigate(['/enrollments/edit', enrollmentID]);
   }
 }

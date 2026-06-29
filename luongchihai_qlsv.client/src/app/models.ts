@@ -3,9 +3,8 @@
  * DTO used when creating or updating enrollment data
  */
 export interface EnrollmentRequest {
-  studentID: string;
-  courseID: number;
-  semester: string;
+  academicYear: number;
+  semester: number;
   processScore?: number | null;
   midtermScore?: number | null;
   finalExamScore?: number | null;
@@ -15,9 +14,11 @@ export interface EnrollmentRequest {
  * DTO used when receiving enrollment data from the API
  */
 export interface EnrollmentResponse {
+  enrollmentID: number;
   studentID: string;
   courseID: number;
-  semester: string;
+  academicYear: number;
+  semester: number;
   processScore?: number | null;
   midtermScore?: number | null;
   finalExamScore?: number | null;

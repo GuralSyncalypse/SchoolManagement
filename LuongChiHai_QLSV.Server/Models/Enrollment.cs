@@ -1,13 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LuongChiHai_QLSV.Server.Models
 {
     public class Enrollment
     {
+        public int EnrollmentID { get; set; }
         public string StudentID { get; set; } = null!;
         public int CourseID { get; set; }
-        public DateTime EnrollmentDate { get; set; }
-        public string Semester { get; set; } = null!;
+        public int AcademicYear { get; set; }
+        public int Semester { get; set; }
 
         // Điểm thành phần
         public decimal? ProcessScore { get; set; }
