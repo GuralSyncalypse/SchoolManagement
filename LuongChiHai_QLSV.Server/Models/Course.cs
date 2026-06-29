@@ -10,6 +10,6 @@ namespace LuongChiHai_QLSV.Server.Models
         public int? Credits { get; set; } // Số tín chỉ
 
         // Navigation property (Mối quan hệ 1 - Nhiều với Enrollment)
-        public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+        public ICollection<CourseOffering>? CourseOfferings { get; set; }
     }
 }

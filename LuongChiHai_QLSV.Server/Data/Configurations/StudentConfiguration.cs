@@ -49,13 +49,6 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
                    .WithOne(f => f.Student) // Giả định trong Model FamilyRelationship có thuộc tính: public virtual Student? Student { get; set; }
                    .HasForeignKey(f => f.StudentID)
                    .OnDelete(DeleteBehavior.Cascade);
-
-            // 6. Quan hệ 1 - Nhiều: Student <-> Enrollment (Đăng ký học phần)
-            builder.HasMany(s => s.Enrollments)
-                   .WithOne(e => e.Student)
-                   .HasForeignKey(e => e.StudentID)
-                   .IsRequired()
-                   .OnDelete(DeleteBehavior.Cascade); // Chọn Cascade để xóa SV thì tự hủy lịch học
         }
     }
 }
