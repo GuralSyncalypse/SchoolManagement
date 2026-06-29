@@ -36,6 +36,9 @@ namespace LuongChiHai_QLSV.Server.Data
             modelBuilder.ApplyConfiguration(new CourseConfiguration());
             modelBuilder.ApplyConfiguration(new CourseOfferingConfiguration());
 
+            // Áp dụng các cấu hình cho việc đăng ký môn
+            modelBuilder.ApplyConfiguration(new EnrollmentConfiguration());
+
             // Tự động tìm tất cả các file có kế thừa IEntityTypeConfiguration trong toàn bộ Project và nạp vào.
             // modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }

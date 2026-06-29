@@ -1,0 +1,56 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-4 shadow-sm bg-white rounded">
+  <h2 class="mb-4 fw-bold">{{ isEditMode() ? 'Cập nhật' : 'Thêm mới' }} đăng ký</h2>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Mã Sinh viên</label>
+      <input formControlName="studentID" class="form-control" [class.is-invalid]="form.controls.studentID.invalid && form.controls.studentID.touched">
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Mã Môn học</label>
+      <input formControlName="courseID" class="form-control" type="number" [class.is-invalid]="form.controls.courseID.invalid && form.controls.courseID.touched">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Năm học</label>
+      <input formControlName="academicYear" type="number" class="form-control">
+    </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Học kỳ</label>
+      <select formControlName="semester" class="form-select">
+        <option value="" disabled>Chọn học kỳ</option>
+        @for (s of [1, 2, 3]; track s) {
+        <option [value]="s">Học kỳ {{ s === 3 ? 'Hè' : s }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Điểm QT</label>
+      <input formControlName="processScore" type="number" class="form-control" (input)="onScoreInput('processScore')">
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Điểm GK</label>
+      <input formControlName="midtermScore" type="number" class="form-control" (input)="onScoreInput('midtermScore')">
+    </div>
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Điểm CK</label>
+      <input formControlName="finalExamScore" type="number" class="form-control" (input)="onScoreInput('finalExamScore')">
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end mt-4">
+    <button type="button" class="btn btn-secondary me-2" [routerLink]="['/enrollments']">Hủy</button>
+    <button type="submit" [disabled]="isSubmitting() || form.invalid" class="btn btn-primary px-4">
+      @if (isSubmitting()) {
+      <span class="spinner-border spinner-border-sm me-2"></span> Đang lưu...
+      } @else {
+      Lưu thông tin
+      }
+    </button>
+  </div>
+</form>

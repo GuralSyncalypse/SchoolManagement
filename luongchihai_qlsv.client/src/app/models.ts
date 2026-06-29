@@ -1,9 +1,29 @@
 
-export interface Enrollment {
+/**
+ * DTO used when creating or updating enrollment data
+ */
+export interface EnrollmentRequest {
+  academicYear: number;
+  semester: number;
+  processScore?: number | null;
+  midtermScore?: number | null;
+  finalExamScore?: number | null;
+}
+
+/**
+ * DTO used when receiving enrollment data from the API
+ */
+export interface EnrollmentResponse {
   enrollmentID: number;
   studentID: string;
-  courseID: string;
-  grade?: number; // Ví dụ về điểm số (có thể chưa có điểm nên dùng ?)
+  courseID: number;
+  academicYear: number;
+  semester: number;
+  processScore?: number | null;
+  midtermScore?: number | null;
+  finalExamScore?: number | null;
+  totalScore?: number | null;
+  isPassed?: boolean | null;
 }
 
 // 1. Interface phục vụ cho trang hiển thị DANH SÁCH (Gọn nhẹ, load nhanh)
