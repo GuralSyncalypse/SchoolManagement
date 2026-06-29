@@ -8,23 +8,7 @@
     </div>
     <div class="col-md-6 mb-3">
       <label class="form-label">Mã Môn học</label>
-      <input formControlName="courseID" class="form-control" type="number" [class.is-invalid]="form.controls.courseID.invalid && form.controls.courseID.touched">
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="col-md-6 mb-3">
-      <label class="form-label">Năm học</label>
-      <input formControlName="academicYear" type="number" class="form-control">
-    </div>
-    <div class="col-md-6 mb-3">
-      <label class="form-label">Học kỳ</label>
-      <select formControlName="semester" class="form-select">
-        <option value="" disabled>Chọn học kỳ</option>
-        @for (s of [1, 2, 3]; track s) {
-        <option [value]="s">Học kỳ {{ s === 3 ? 'Hè' : s }}</option>
-        }
-      </select>
+      <input formControlName="offeringID" class="form-control" type="number" [class.is-invalid]="form.controls.offeringID.invalid && form.controls.offeringID.touched">
     </div>
   </div>
 

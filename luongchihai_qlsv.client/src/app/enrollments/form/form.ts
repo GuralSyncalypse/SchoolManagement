@@ -32,10 +32,17 @@ export class EnrollmentForm implements OnInit {
 
   form = new FormGroup({
     enrollmentID: new FormControl<number>(0), // Thêm ID vào form
-    studentID: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    courseID: new FormControl<number | null>(null, { validators: [Validators.required] }),
-    academicYear: new FormControl<number>(2025, { nonNullable: true, validators: [Validators.required] }),
-    semester: new FormControl<number>(1, { nonNullable: true, validators: [Validators.required] }),
+    // Dùng nonNullable: true để tránh giá trị null nếu không cần thiết
+    studentID: new FormControl<string>('', {
+      nonNullable: true,
+      validators: [Validators.required]
+    }),
+
+    // Sửa lại: Tham số đầu tiên là giá trị khởi tạo (ví dụ: null hoặc 0)
+    offeringID: new FormControl<number>(0, {
+      nonNullable: true,
+      validators: [Validators.required, Validators.min(1)] // Thêm min(1) nếu ID phải là số dương
+    }),
     processScore: new FormControl<number | null>(null, [Validators.min(0), Validators.max(10)]),
     midtermScore: new FormControl<number | null>(null, [Validators.min(0), Validators.max(10)]),
     finalExamScore: new FormControl<number | null>(null, [Validators.min(0), Validators.max(10)])
@@ -69,8 +76,7 @@ export class EnrollmentForm implements OnInit {
 
         // Có thể disable các trường khóa nếu không muốn cho sửa
         this.form.controls.studentID.disable();
-        this.form.controls.courseID.disable();
-        this.form.controls.academicYear.disable();
+        this.form.controls.offeringID.disable();
       });
     }
   }
