@@ -1,17 +1,16 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { StudentListDTO } from '../models';
-import { StudentService } from './students.service';
+import { StudentListDTO } from '../../models/student.model';
+import { StudentService } from '../../services/students.service';
 
 @Component({
-  selector: 'app-students',
+  selector: 'app-student-list',
   standalone: true,
   imports: [RouterModule],
-  templateUrl: './students.html',
-  styleUrls: ['./students.css']
+  templateUrl: './student-list.component.html',
+  styleUrl: './student-list.component.css',
 })
-export class Students implements OnInit {
+export class StudentListComponent {
   // Inject Service và Router vào component
   private studentService = inject(StudentService);
   private router = inject(Router);
@@ -61,3 +60,4 @@ export class Students implements OnInit {
     }
   }
 }
+

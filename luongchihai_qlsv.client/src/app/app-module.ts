@@ -6,12 +6,6 @@ import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { Students } from './students/students';
-import { StudentForm } from './students/form/form';
-import { Courses } from './courses/courses';
-import { CourseForm } from './courses/form/form';
-import { Enrollments } from './enrollments/enrollments';
-import { EnrollmentForm } from './enrollments/form/form';
 
 @NgModule({
   declarations: [App],
@@ -19,13 +13,7 @@ import { EnrollmentForm } from './enrollments/form/form';
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-    DashboardComponent,
-    Students,
-    StudentForm,
-    Courses,
-    CourseForm,
-    Enrollments,
-    EnrollmentForm
+    DashboardComponent
   ],
   providers: [provideBrowserGlobalErrorListeners()],
   bootstrap: [App],

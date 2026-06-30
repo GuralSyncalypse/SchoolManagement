@@ -29,12 +29,6 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
             // 4. Index (unique course code)
             builder.HasIndex(e => e.CourseCode)
                 .IsUnique();
-
-            // 5. Relationship: Course (1) -> (N) CourseOffering
-            builder.HasMany(e => e.CourseOfferings)
-                .WithOne(e => e.Course)
-                .HasForeignKey(e => e.CourseID)
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

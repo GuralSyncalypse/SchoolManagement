@@ -1,6 +1,6 @@
 using LuongChiHai_QLSV.Server.Data;
+using LuongChiHai_QLSV.Server.DTOs.Students;
 using LuongChiHai_QLSV.Server.Models;
-using LuongChiHai_QLSV.Server.Models.StudentDTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

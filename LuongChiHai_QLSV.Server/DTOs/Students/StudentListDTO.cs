@@ -1,4 +1,4 @@
-﻿namespace LuongChiHai_QLSV.Server.Models.StudentDTOs
+﻿namespace LuongChiHai_QLSV.Server.DTOs.Students
 {
     public class StudentListDTO
     {

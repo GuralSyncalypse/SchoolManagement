@@ -9,7 +9,5 @@ namespace LuongChiHai_QLSV.Server.Models
         public string CourseCode { get; set; } = string.Empty;
         public int? Credits { get; set; } // Số tín chỉ
 
-        // Navigation property (Mối quan hệ 1 - Nhiều với Enrollment)
-        public ICollection<CourseOffering>? CourseOfferings { get; set; }
     }
 }

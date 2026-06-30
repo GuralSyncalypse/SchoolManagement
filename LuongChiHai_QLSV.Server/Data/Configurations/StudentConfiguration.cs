@@ -50,13 +50,6 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
                    .HasForeignKey(f => f.StudentID)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            // =================================================
-            // 1 - N: Student ↔ Enrollment
-            // =================================================
-            builder.HasMany(s => s.Enrollments)
-                .WithOne(e => e.Student)
-                .HasForeignKey(e => e.StudentID)
-                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
