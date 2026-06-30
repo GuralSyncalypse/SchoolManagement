@@ -1,4 +1,5 @@
 ﻿using LuongChiHai_QLSV.Server.Data.Configurations;
+using LuongChiHai_QLSV.Server.Entities;
 using LuongChiHai_QLSV.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -11,6 +12,10 @@ namespace LuongChiHai_QLSV.Server.Data
         {
         }
 
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
+        public DbSet<StudentAccount> StudentAccounts { get; set; }
         public DbSet<Student> Students { get; set; } = null!;
         public DbSet<AcademicProfile> AcademicProfiles { get; set; } = null!;
         public DbSet<StudentProfile> StudentProfiles { get; set; } = null!;
@@ -31,6 +36,20 @@ namespace LuongChiHai_QLSV.Server.Data
 
             // Áp dụng các cấu hình cho việc quản lý môn học
             modelBuilder.ApplyConfiguration(new CourseConfiguration());
+
+            // 1. Cấu hình Khóa phức hợp cho UserRole (UserID, RoleID)
+            modelBuilder.Entity<UserRole>()
+                .HasKey(ur => new { ur.UserID, ur.RoleID });
+
+            // 2. Đảm bảo luật Unique cho Username
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+
+            // 3. Đảm bảo luật Unique cho RoleName
+            modelBuilder.Entity<Role>()
+                .HasIndex(r => r.RoleName)
+                .IsUnique();
 
             // Tự động tìm tất cả các file có kế thừa IEntityTypeConfiguration trong toàn bộ Project và nạp vào.
             // modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

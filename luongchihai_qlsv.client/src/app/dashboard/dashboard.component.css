@@ -1,61 +1,374 @@
-.dashboard-wrapper {
-  padding: 2rem;
-  font-family: system-ui, sans-serif;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.dashboard-header {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-  .dashboard-header h1 {
-    color: #2c3e50;
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-.dashboard-grid {
+/* --- BỐ CỤC CHUNG --- */
+.admin-container {
   display: flex;
-  gap: 2rem;
-  justify-content: center;
-  flex-wrap: wrap;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #334155;
 }
 
-.dashboard-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 2rem;
-  width: 300px;
-  text-align: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+/* --- SIDEBAR THANH ĐIỀU HƯỚNG --- */
+.sidebar {
+  width: 260px;
+  background-color: #0f172a;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 16px;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
 }
 
-  .dashboard-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 20px 8px;
+  border-b: 1px solid #334155;
+  margin-bottom: 24px;
+}
+
+.brand-icon {
+  font-size: 24px;
+}
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #818cf8;
+  margin: 0;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+  .sidebar-link:hover {
+    background-color: #1e293b;
+    color: #ffffff;
   }
 
-.card-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  .sidebar-link.active {
+    background-color: #4f46e5;
+    color: #ffffff;
+  }
+
+.sidebar-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #334155;
 }
 
-.dashboard-btn {
-  background-color: #3182ce;
-  color: white;
+  .sidebar-profile .avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #6366f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+  }
+
+.profile-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.logout-btn {
+  background: none;
   border: none;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  border-radius: 6px;
+  color: #f43f5e;
+  font-size: 12px;
+  padding: 0;
   cursor: pointer;
-  margin-top: 1rem;
-  transition: background-color 0.2s;
+  text-decoration: none;
 }
 
-  .dashboard-btn:hover {
-    background-color: #2b6cb0;
+  .logout-btn:hover {
+    text-decoration: underline;
   }
+
+/* --- KHÔNG GIAN CHÍNH & TOPBAR --- */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.topbar {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 32px;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.topbar-date {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.notification-wrapper {
+  position: relative;
+}
+
+.notification-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: #f43f5e;
+  color: white;
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- VÙNG NỘI DUNG DASHBOARD --- */
+.dashboard-body {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  max-width: 1600px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.welcome-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.welcome-subtitle {
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+/* --- KPI CARDS (GRID SYSTEM) --- */
+.kpi-grid {
+  display: grid;
+  grid-template-cols: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.kpi-card {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.kpi-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.kpi-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 8px 0;
+}
+
+.trend-text {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.trend-up {
+  color: #10b981;
+}
+
+.trend-sub {
+  color: #94a3b8;
+}
+
+.trend-neutral {
+  color: #64748b;
+}
+
+.trend-danger {
+  color: #e11d48;
+}
+
+.kpi-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.icon-indigo {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+}
+
+.icon-amber {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.icon-rose {
+  background-color: #ffe4e6;
+  color: #e11d48;
+}
+
+/* --- KHU VỰC THAO TÁC CHÍNH --- */
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 16px 0;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-cols: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.category-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+  .category-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  }
+
+.card-main-content {
+  padding: 24px;
+}
+
+.category-icon {
+  font-size: 32px;
+  margin-bottom: 16px;
+  transition: transform 0.2s ease;
+  transform-origin: left;
+}
+
+.category-card:hover .category-icon {
+  transform: scale(1.1);
+}
+
+.category-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.category-desc {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.card-actions {
+  padding: 0 24px 24px 24px;
+}
+
+.category-btn {
+  width: 100%;
+  background-color: #f1f5f9;
+  color: #334155;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.category-card:hover .category-btn {
+  background-color: #4f46e5;
+  color: #ffffff;
+}
+
+/* --- RESPONSIVE CHO DI ĐỘNG --- */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+  /* Ẩn sidebar trên mobile, có thể làm menu hamburger sau */
+  .topbar {
+    padding: 0 16px;
+  }
+
+  .dashboard-body {
+    padding: 16px;
+    gap: 24px;
+  }
+}
