@@ -1,11 +1,14 @@
 using LuongChiHai_QLSV.Server.Data;
 using LuongChiHai_QLSV.Server.DTOs.Students;
-using LuongChiHai_QLSV.Server.Models;
+using LuongChiHai_QLSV.Server.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class StudentsController : ControllerBase
 {
     private readonly SchoolContext _context;
@@ -16,314 +19,176 @@ public class StudentsController : ControllerBase
 
     // GET: api/Student
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Student>>> GetStudent()
+    public async Task<ActionResult<IEnumerable<StudentResponseDto>>> GetStudent()
     {
-        // Gọi trực tiếp DbSet để lấy toàn bộ bảng dữ liệu thô về bộ nhớ
-        List<Student> allStudents = await _context.Students.ToListAsync();
-        List<AcademicProfile> allAcademicProfiles = await _context.AcademicProfiles.ToListAsync();
-        List<StudentProfile> allStudentProfiles = await _context.StudentProfiles.ToListAsync();
+        var students = await _context.Students
+            .Include(s => s.AcademicProfile)
+            .Include(s => s.FamilyRelationships)
+            .ToListAsync();
 
-        // Khởi tạo danh sách kết quả trả về cho Angular
-        List<StudentListDTO> resultList = new List<StudentListDTO>();
-
-        foreach (var student in allStudents)
+        if (students == null || !students.Any()) return NotFound("Không tìm thấy sinh viên nào.");
+            
+        // 2. Chuyển đổi (Map) thủ công từ Entity sang DTO
+        var response = students.Select(s => new StudentResponseDto
         {
-            StudentListDTO dto = new StudentListDTO();
-            dto.StudentID = student.StudentID;
-            dto.StudentName = student.StudentName;
-            dto.Gender = student.Gender;
+            StudentID = s.StudentID,
+            StudentName = s.StudentName,
+            Gender = s.Gender,
+            Ethnicity = s.Ethnicity,
+            PermanentAddress = s.PermanentAddress,
 
-            // Tìm thông tin học vấn từ bảng AcademicProfile dựa trên StudentID
-            foreach (var academic in allAcademicProfiles)
+            // Map object lồng nhau (AcademicProfile)
+            AcademicProfile = s.AcademicProfile == null ? null : new AcademicProfileDto
             {
-                if (academic.StudentID == student.StudentID)
-                {
-                    dto.ClassName = academic.ClassName;
-                    dto.MajorName = academic.MajorName;
-                    dto.Status = academic.Status;
-                    break;
-                }
-            }
+                ClassName = s.AcademicProfile.ClassName,
+                FacultyName = s.AcademicProfile.FacultyName,
+                MajorName = s.AcademicProfile.MajorName
+            },
 
-            // Tìm thông tin sinh viên từ bảng StudentProfile dựa trên StudentID
-            foreach (var profile in allStudentProfiles)
+            // Map collection lồng nhau (FamilyRelationships)
+            FamilyRelationships = s.FamilyRelationships?.Select(fr => new FamilyRelationshipDto
             {
-                if (profile.StudentID == student.StudentID)
-                {
-                    dto.PhoneNumber = profile.PhoneNumber;
-                    break;
-                }
-            }
+                RelativeName = fr.RelativeName,
+                RelationshipType = fr.RelationshipType,
+                PhoneNumber = fr.PhoneNumber ?? ""
+            }).ToList() ?? new List<FamilyRelationshipDto>()
+        }).ToList();
 
-            // Sau khi gom đủ thông tin từ 3 bảng, thêm đối tượng DTO vào danh sách kết quả
-            resultList.Add(dto);
-        }
-        return Ok(resultList);
+        // Map Entity sang DTO
+        return Ok(response);
     }
 
     // GET: api/Student/5
     [HttpGet("{studentid}")]
-    public async Task<ActionResult<Student>> GetStudent(string studentid)
+    public async Task<ActionResult<StudentResponseDto>> GetStudent(string studentid)
     {
-        var student = await _context.Students.FindAsync(studentid);
+        // 1. Sử dụng Include để lấy các thông tin liên quan
+        var student = await _context.Students
+            .Include(s => s.AcademicProfile)
+            .Include(s => s.FamilyRelationships)
+            .FirstOrDefaultAsync(s => s.StudentID == studentid);
 
         if (student == null)
         {
-            return NotFound("Không tìm thấy sinh viên");
+            return NotFound($"Không tìm thấy sinh viên có mã: {studentid}");
         }
 
-        // Tiếp tục tìm bản ghi tương ứng ở các bảng phụ (vì Khóa chính của chúng cũng là StudentID)
-        AcademicProfile? academic = await _context.AcademicProfiles.FindAsync(studentid);
-        StudentProfile? profile = await _context.StudentProfiles.FindAsync(studentid);
-
-        // Riêng bảng FamilyRelationship, khóa chính là FamilyMemberID (số tự tăng) chứ không phải StudentID.
-        // Vì vậy ta phải load bảng này về và dùng vòng lặp để nhặt ra người thân của sinh viên này.
-        List<FamilyRelationship> allFamilies = await _context.FamilyRelationships.ToListAsync();
-
-        // Khởi tạo DTO chi tiết để đẩy lên Form Angular
-        StudentDetailDTO detailDto = new StudentDetailDTO();
-
-        // 1. Gán thông tin từ bảng Student
-        detailDto.StudentID = student.StudentID;
-        detailDto.StudentName = student.StudentName;
-        detailDto.Gender = student.Gender;
-
-        // 2. Gán thông tin từ bảng AcademicProfile (nếu có)
-        if (academic != null)
+        // 2. Map thủ công sang DTO
+        var response = new StudentResponseDto
         {
-            detailDto.AdmissionDate = academic.AdmissionDate ?? null;
-            detailDto.ClassName = academic.ClassName;
-            detailDto.CampusName = academic.CampusName;
-            detailDto.EducationLevel = academic.EducationLevel;
-            detailDto.EducationType = academic.EducationType;
-            detailDto.FacultyName = academic.FacultyName;
-            detailDto.MajorName = academic.MajorName;
-            detailDto.SpecializationName = academic.SpecializationName;
-            detailDto.AcademicYear = academic.AcademicYear;
-            detailDto.Status = academic.Status;
-        }
+            StudentID = student.StudentID,
+            StudentName = student.StudentName,
+            Gender = student.Gender,
+            Ethnicity = student.Ethnicity,
+            PermanentAddress = student.PermanentAddress,
 
-        // 3. Gán thông tin từ bảng StudentProfile (nếu có)
-        if (profile != null)
-        {
-            detailDto.BirthDate = profile.BirthDate ?? null;
-            detailDto.Ethnicity = profile.Ethnicity;
-            detailDto.Religion = profile.Religion;
-            detailDto.Nationality = profile.Nationality;
-            detailDto.BirthPlace = profile.BirthPlace;
-            detailDto.CitizenID = profile.CitizenID;
-            detailDto.CitizenIDIssueDate = profile.CitizenIDIssueDate ?? null;
-            detailDto.CitizenIDIssuePlace = profile.CitizenIDIssuePlace;
-            detailDto.PhoneNumber = profile.PhoneNumber;
-            detailDto.Email = profile.Email;
-            detailDto.PermanentAddress = profile.PermanentAddress;
-            detailDto.TemporaryAddress = profile.TemporaryAddress;
-        }
-
-        // 4. Lọc danh sách người thân bằng vòng lặp foreach thuần túy
-        detailDto.FamilyRelationships = new List<FamilyMemberDTO>();
-        foreach (var member in allFamilies)
-        {
-            if (member.StudentID == studentid)
+            AcademicProfile = student.AcademicProfile == null ? null : new AcademicProfileDto
             {
-                FamilyMemberDTO familyDto = new FamilyMemberDTO();
-                familyDto.FamilyMemberID = member.FamilyMemberID;
-                familyDto.RelativeName = member.RelativeName;
-                familyDto.RelationshipType = member.RelationshipType;
-                familyDto.PhoneNumber = member.PhoneNumber;
-                familyDto.BirthYear = member.BirthYear;
+                ClassName = student.AcademicProfile.ClassName,
+                FacultyName = student.AcademicProfile.FacultyName,
+                MajorName = student.AcademicProfile.MajorName
+            },
 
-                detailDto.FamilyRelationships.Add(familyDto);
-            }
-        }
+            FamilyRelationships = student.FamilyRelationships?.Select(fr => new FamilyRelationshipDto
+            {
+                RelativeName = fr.RelativeName,
+                RelationshipType = fr.RelationshipType,
+                PhoneNumber = fr.PhoneNumber ?? ""
+            }).ToList() ?? new List<FamilyRelationshipDto>()
+        };
 
-        return Ok(detailDto);
+        return Ok(response);
     }
 
     // PUT: api/Student/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{studentid}")]
-    public async Task<IActionResult> PutStudent(string studentid, [FromBody] StudentDetailDTO updateDto)
+    public async Task<IActionResult> PutStudent(string? studentid, Student student)
     {
-        if (studentid != updateDto.StudentID) return BadRequest("Mã sinh viên không khớp.");
+        if (studentid != student.StudentID)
+        {
+            return BadRequest();
+        }
 
-        using var transaction = await _context.Database.BeginTransactionAsync();
+        _context.Entry(student).State = EntityState.Modified;
+
         try
         {
-            // 1. Tìm các thực thể hiện tại trong DB
-            var student = await _context.Students.FindAsync(studentid);
-            var profile = await _context.StudentProfiles.FindAsync(studentid);
-            var academic = await _context.AcademicProfiles.FindAsync(studentid);
-            var family = await _context.FamilyRelationships
-                .Where(f => f.StudentID == studentid)
-                .ToListAsync();
-
-            if (student == null || profile == null || academic == null)
-                return NotFound("Không tìm thấy hồ sơ để cập nhật.");
-
-            // 2. Cập nhật bảng Student
-            student.StudentName = updateDto.StudentName;
-            student.Gender = updateDto.Gender;
-
-            // 3. Cập nhật bảng StudentProfile
-            profile.PhoneNumber = updateDto.PhoneNumber ?? profile.PhoneNumber;
-            profile.Email = updateDto.Email ?? profile.Email;
-            profile.BirthDate = updateDto.BirthDate;
-            profile.Ethnicity = updateDto.Ethnicity;
-            profile.Religion = updateDto.Religion;
-            profile.Nationality = updateDto.Nationality;
-            profile.BirthPlace = updateDto.BirthPlace;
-            profile.CitizenID = updateDto.CitizenID;
-            profile.CitizenIDIssueDate = updateDto.CitizenIDIssueDate;
-            profile.CitizenIDIssuePlace = updateDto.CitizenIDIssuePlace;
-            profile.PermanentAddress = updateDto.PermanentAddress;
-            profile.TemporaryAddress = updateDto.TemporaryAddress;
-
-            // 4. Cập nhật bảng AcademicProfile
-            academic.Status = updateDto.Status ?? academic.Status;
-            academic.AdmissionDate = updateDto.AdmissionDate ?? academic.AdmissionDate;
-            academic.AcademicYear = updateDto.AcademicYear ?? academic.AcademicYear;
-            academic.EducationLevel = updateDto.EducationLevel ?? academic.EducationLevel;
-            academic.EducationType = updateDto.EducationType ?? academic.EducationType;
-            academic.FacultyName = updateDto.FacultyName ?? academic.FacultyName;
-            academic.MajorName = updateDto.MajorName ?? academic.MajorName;
-            academic.SpecializationName = updateDto.SpecializationName;
-            academic.CampusName = updateDto.CampusName ?? academic.CampusName;
-            academic.ClassName = updateDto.ClassName ?? academic.ClassName;
-
-            // 5. Cập nhật bảng FamilyRelationship (Logic Xóa cũ - Thêm mới)
-            // Lấy danh sách hiện có trong database của sinh viên này
-            var existingFamilyMembers = await _context.FamilyRelationships
-                .Where(f => f.StudentID == studentid)
-                .ToListAsync();
-
-            // Xóa toàn bộ dữ liệu cũ
-            _context.FamilyRelationships.RemoveRange(existingFamilyMembers);
-
-            // Thêm mới toàn bộ dữ liệu từ DTO
-            if (updateDto.FamilyRelationships != null && updateDto.FamilyRelationships.Any())
-            {
-                foreach (var memberDto in updateDto.FamilyRelationships)
-                {
-                    var newMember = new FamilyRelationship
-                    {
-                        StudentID = studentid, // Gán khóa ngoại
-                        RelativeName = memberDto.RelativeName,
-                        RelationshipType = memberDto.RelationshipType,
-                        PhoneNumber = string.IsNullOrWhiteSpace(memberDto.PhoneNumber) ? null : memberDto.PhoneNumber,
-                        BirthYear = memberDto.BirthYear
-                        // Không cần gán FamilyMemberID vì database sẽ tự sinh ID mới khi lưu
-                    };
-                    _context.FamilyRelationships.Add(newMember);
-                }
-            }
-
-            // 6. Lưu và xác nhận
             await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-
-            return NoContent(); // 204 No Content là chuẩn cho PUT thành công
         }
-        catch (Exception ex)
+        catch (DbUpdateConcurrencyException)
         {
-            await transaction.RollbackAsync();
-            return StatusCode(500, $"Lỗi cập nhật hệ thống: {ex.Message}");
+            if (!StudentExists(studentid))
+            {
+                return NotFound();
+            }
+            else
+            {
+                throw;
+            }
         }
+
+        return NoContent();
     }
 
     // POST: api/Student
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<StudentDetailDTO>> PostStudent([FromBody] StudentDetailDTO createDto)
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<StudentResponseDto>> PostStudent(StudentRequestDto request)
     {
-        if (createDto == null) return BadRequest("Dữ liệu không hợp lệ.");
-
-        // Sử dụng Transaction để đảm bảo tính toàn vẹn dữ liệu
-        using var transaction = await _context.Database.BeginTransactionAsync();
-        try
+        // 1. Kiểm tra validation thủ công (tuỳ chọn vì [ApiController] đã làm điều này)
+        if (!ModelState.IsValid)
         {
-            // 1. Kiểm tra tồn tại
-            if (await _context.Students.AnyAsync(s => s.StudentID == createDto.StudentID))
-                return BadRequest("Mã số sinh viên này đã tồn tại.");
-
-            // 2. Student chính
-            Student student = new()
-            {
-                StudentID = createDto.StudentID,
-                StudentName = createDto.StudentName,
-                Gender = createDto.Gender
-            };
-
-            // 3. StudentProfile
-            StudentProfile profile = new()
-            {
-                StudentID = student.StudentID,
-                BirthDate = createDto.BirthDate,
-                PhoneNumber = createDto.PhoneNumber,
-                Email = createDto.Email,
-                Ethnicity = createDto.Ethnicity,
-                Religion = createDto.Religion,
-                Nationality = createDto.Nationality,
-                BirthPlace = createDto.BirthPlace,
-                CitizenID = createDto.CitizenID,
-                CitizenIDIssueDate = createDto.CitizenIDIssueDate,
-                CitizenIDIssuePlace = createDto.CitizenIDIssuePlace,
-                PermanentAddress = createDto.PermanentAddress,
-                TemporaryAddress = createDto.TemporaryAddress
-            };
-
-            // 4. AcademicProfile
-            AcademicProfile academic = new()
-            {
-                StudentID = student.StudentID,
-                Status = createDto.Status ?? "Đang học",
-                AdmissionDate = createDto.AdmissionDate,
-                AcademicYear = createDto.AcademicYear,
-                EducationLevel = createDto.EducationLevel,
-                EducationType = createDto.EducationType,
-                FacultyName = createDto.FacultyName,
-                MajorName = createDto.MajorName,
-                SpecializationName = createDto.SpecializationName,
-                CampusName = createDto.CampusName,
-                ClassName = createDto.ClassName
-            };
-
-            _context.Students.Add(student);
-            _context.StudentProfiles.Add(profile);
-            _context.AcademicProfiles.Add(academic);
-
-            // 5. Cập nhật bảng FamilyRelationship (Logic Xóa cũ - Thêm mới)
-            // Thêm mới toàn bộ dữ liệu từ DTO
-            if (createDto.FamilyRelationships != null && createDto.FamilyRelationships.Any())
-            {
-                foreach (var memberDto in createDto.FamilyRelationships)
-                {
-                    var newMember = new FamilyRelationship
-                    {
-                        StudentID = student.StudentID, // Gán khóa ngoại
-                        RelativeName = memberDto.RelativeName,
-                        RelationshipType = memberDto.RelationshipType,
-                        PhoneNumber = string.IsNullOrWhiteSpace(memberDto.PhoneNumber) ? null : memberDto.PhoneNumber,
-                        BirthYear = memberDto.BirthYear
-                        // Không cần gán FamilyMemberID vì database sẽ tự sinh ID mới khi lưu
-                    };
-                    _context.FamilyRelationships.Add(newMember);
-                }
-            }
-
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-
-            return CreatedAtAction(nameof(GetStudent), new { studentid = student.StudentID }, createDto);
+            return BadRequest(ModelState);
         }
-        catch (Exception ex)
+
+        // 2. Kiểm tra trùng lặp mã sinh viên
+        if (await _context.Students.AnyAsync(s => s.StudentID == request.StudentID))
         {
-            await transaction.RollbackAsync();
-            return StatusCode(500, $"Lỗi hệ thống: {ex.Message}");
+            return Conflict(new { message = $"Mã sinh viên {request.StudentID} đã tồn tại trong hệ thống." });
         }
+
+        // 3. Map từ DTO sang Entity
+        var newStudent = new Student
+        {
+            StudentID = request.StudentID,
+            UserID = request.UserID,
+            StudentName = request.StudentName,
+            Gender = request.Gender,
+            BirthDate = request.BirthDate,
+            Ethnicity = request.Ethnicity,
+            Religion = request.Religion,
+            Nationality = request.Nationality,
+            BirthPlace = request.BirthPlace,
+            CitizenID = request.CitizenID,
+            CitizenIDIssueDate = request.CitizenIDIssueDate,
+            CitizenIDIssuePlace = request.CitizenIDIssuePlace,
+            PermanentAddress = request.PermanentAddress,
+            TemporaryAddress = request.TemporaryAddress
+        };
+
+        // 4. Lưu vào cơ sở dữ liệu
+        _context.Students.Add(newStudent);
+        await _context.SaveChangesAsync();
+
+        // 5. Map sang ResponseDTO để trả về (Tránh lỗi Object Cycle)
+        var response = new StudentResponseDto
+        {
+            StudentID = newStudent.StudentID,
+            StudentName = newStudent.StudentName,
+            Gender = newStudent.Gender,
+            Ethnicity = newStudent.Ethnicity,
+            PermanentAddress = newStudent.PermanentAddress
+            // Có thể map thêm các field khác nếu cần
+        };
+
+        // 6. Trả về mã 201 Created cùng với location của resource vừa tạo
+        return CreatedAtAction(nameof(GetStudent), new { studentid = newStudent.StudentID }, response);
     }
 
     // DELETE: api/Student/5
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{studentid}")]
     public async Task<IActionResult> DeleteStudent(string? studentid)
     {

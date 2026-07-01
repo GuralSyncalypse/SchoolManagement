@@ -21,6 +21,8 @@ export class RegisterComponent implements OnInit {
     this.registerForm = new FormGroup({
       username: new FormControl('', [Validators.required, Validators.minLength(4)]),
       password: new FormControl('', [Validators.required, Validators.minLength(4)]),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      phoneNumber: new FormControl('', [Validators.required, Validators.pattern(/^\d{10}$/)]),
       roleName: new FormControl('Student', [Validators.required]),
 
       // Nhóm trường thông tin sinh viên
@@ -54,6 +56,7 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit(): void {
+    console.log(this.registerForm)
     if (this.registerForm.invalid) return;
 
     this.isLoading = true;

@@ -1,4 +1,4 @@
-﻿using LuongChiHai_QLSV.Server.Models;
+﻿using LuongChiHai_QLSV.Server.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -16,12 +16,6 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
             builder.Property(e => e.StudentID)
                    .HasColumnType("varchar(15)");
 
-            // 3. Cấu hình Status (Bắt buộc)
-            builder.Property(e => e.Status)
-                   .IsRequired()
-                   .HasMaxLength(50)
-                   .HasDefaultValue("Đang học");
-
             // 4. Các trường tùy chọn (Cho phép null)
             builder.Property(e => e.AdmissionDate);
             builder.Property(e => e.ClassName).HasMaxLength(50);
@@ -38,6 +32,10 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
                    .WithOne(s => s.AcademicProfile)
                    .HasForeignKey<AcademicProfile>(a => a.StudentID)
                    .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(a => a.StudentStatus)
+               .WithMany(s => s.AcademicProfiles)
+               .HasForeignKey(a => a.StatusID);
         }
     }
 }

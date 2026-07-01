@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace LuongChiHai_QLSV.Server.Models
+namespace LuongChiHai_QLSV.Server.Entities
 {
     [Table("AcademicProfile")]
     public class AcademicProfile
@@ -11,35 +11,35 @@ namespace LuongChiHai_QLSV.Server.Models
         [Column("StudentID", TypeName = "varchar(15)")]
         public string StudentID { get; set; } = string.Empty;
 
-        public DateTime? AdmissionDate { get; set; }
+        public DateTime? AdmissionDate { get; set; } = null!;
 
         [StringLength(50)]
-        public string? ClassName { get; set; }
+        public string? ClassName { get; set; } = null!;
 
         [StringLength(100)]
-        public string? CampusName { get; set; }
+        public string? CampusName { get; set; } = null!;
 
         [StringLength(50)]
-        public string? EducationLevel { get; set; }
+        public string? EducationLevel { get; set; } = null!;
         [StringLength(50)]
-        public string? EducationType { get; set; }
+        public string? EducationType { get; set; } = null!;
 
         [StringLength(100)]
-        public string? FacultyName { get; set; }
+        public string? FacultyName { get; set; } = null!;
 
         [StringLength(100)]
-        public string? MajorName { get; set; }
+        public string? MajorName { get; set; } = null!;
 
         [StringLength(100)]
-        public string? SpecializationName { get; set; }
+        public string? SpecializationName { get; set; } = null!;
 
-        public int? AcademicYear { get; set; }
+        public int? AcademicYear { get; set; } = null!;
 
-        [Required]
-        [StringLength(50)]
-        public string Status { get; set; } = "Đang học";
+        public int StatusID { get; set; } // Foreign Key to StudentStatus
+
 
         // Navigation property ngược lại Student
-        public virtual Student? Student { get; set; }
+        public Student Student { get; set; } = null!;
+        public StudentStatus StudentStatus { get; set; } = null!;
     }
 }

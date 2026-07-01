@@ -1,6 +1,5 @@
 ﻿using LuongChiHai_QLSV.Server.Data.Configurations;
 using LuongChiHai_QLSV.Server.Entities;
-using LuongChiHai_QLSV.Server.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -15,10 +14,8 @@ namespace LuongChiHai_QLSV.Server.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<StudentAccount> StudentAccounts { get; set; }
         public DbSet<Student> Students { get; set; } = null!;
         public DbSet<AcademicProfile> AcademicProfiles { get; set; } = null!;
-        public DbSet<StudentProfile> StudentProfiles { get; set; } = null!;
         public DbSet<FamilyRelationship> FamilyRelationships { get; set; } = null!;
 
         // Các bảng cũ của bạn
@@ -30,7 +27,6 @@ namespace LuongChiHai_QLSV.Server.Data
 
             // Áp dụng các cấu hình cho việc quản lý thông tin sinh viên
             modelBuilder.ApplyConfiguration(new StudentConfiguration());
-            modelBuilder.ApplyConfiguration(new StudentProfileConfiguration());
             modelBuilder.ApplyConfiguration(new AcademicProfileConfiguration());
             modelBuilder.ApplyConfiguration(new FamilyRelationshipConfiguration());
 

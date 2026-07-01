@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace LuongChiHai_QLSV.Server.Models
+namespace LuongChiHai_QLSV.Server.Entities
 {
     public class FamilyRelationship
     {

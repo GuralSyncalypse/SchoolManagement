@@ -1,7 +1,7 @@
 ﻿using LuongChiHai_QLSV.Server.Data;
 using LuongChiHai_QLSV.Server.DTOs.Auths;
 using LuongChiHai_QLSV.Server.Entities;
-using LuongChiHai_QLSV.Server.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +26,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
         }
 
         [HttpPost("register")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
             // 1. Kiểm tra tài khoản đã tồn tại chưa
@@ -57,6 +58,8 @@ namespace LuongChiHai_QLSV.Server.Controllers
                 {
                     Username = request.Username,
                     PasswordHash = request.Password, // Thực tế nên dùng BCrypt.Net để HashPassword
+                    Email = request.Email,
+                    PhoneNumber = request.PhoneNumber,
                     IsActive = true,
                     CreatedAt = DateTime.UtcNow
                 };
@@ -83,13 +86,6 @@ namespace LuongChiHai_QLSV.Server.Controllers
                         Gender = request.Gender ?? "Khác"
                     };
                     _context.Students.Add(newStudent);
-
-                    var studentAccount = new StudentAccount
-                    {
-                        StudentID = newStudent.StudentID,
-                        UserID = newUser.UserID
-                    };
-                    _context.StudentAccounts.Add(studentAccount);
                 }
 
                 await _context.SaveChangesAsync();
@@ -105,6 +101,7 @@ namespace LuongChiHai_QLSV.Server.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
         {
             // 1. Tìm user kèm theo danh sách Roles của họ

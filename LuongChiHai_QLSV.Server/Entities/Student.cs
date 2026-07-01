@@ -1,19 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LuongChiHai_QLSV.Server.Entities;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace LuongChiHai_QLSV.Server.Models
+namespace LuongChiHai_QLSV.Server.Entities
 {
     public class Student
     {
-        public string StudentID { get; set; } = string.Empty;
-        public string StudentName { get; set; } = string.Empty;
-        public string Gender { get; set; } = string.Empty;
+        public string StudentID { get; set; } = null!; // Primary Key
+        public int UserID { get; set; } // Foreign Key to User
+        public string StudentName { get; set; } = null!;
+        public string? Gender { get; set; }
+        public DateTime? BirthDate { get; set; }
+        public string? Ethnicity { get; set; }
+        public string? Religion { get; set; }
+        public string? Nationality { get; set; }
+        public string? BirthPlace { get; set; }
+        public string? CitizenID { get; set; }
+        public DateTime? CitizenIDIssueDate { get; set; }
+        public string? CitizenIDIssuePlace { get; set; }
+        public string? PermanentAddress { get; set; }
+        public string? TemporaryAddress { get; set; }
 
-        // Mối quan hệ 1 - 1
-        public virtual AcademicProfile? AcademicProfile { get; set; }
-        public virtual StudentProfile? StudentProfile { get; set; }
-
-        // Mối quan hệ 1 - Nhiều
-        public virtual ICollection<FamilyRelationship> FamilyRelationships { get; set; } = new List<FamilyRelationship>();
+        // Navigation Property
+        public ICollection<FamilyRelationship> FamilyRelationships { get; set; } = new List<FamilyRelationship>();
+        public AcademicProfile? AcademicProfile { get; set; } = null!; // 1-1
+        public User User { get; set; } = null!;
     }
 }

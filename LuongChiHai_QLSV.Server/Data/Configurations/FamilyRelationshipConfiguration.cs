@@ -1,4 +1,4 @@
-﻿using LuongChiHai_QLSV.Server.Models;
+﻿using LuongChiHai_QLSV.Server.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

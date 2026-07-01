@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using LuongChiHai_QLSV.Server.Models;
+using LuongChiHai_QLSV.Server.Entities;
 
 namespace LuongChiHai_QLSV.Server.Data.Configurations
 {
@@ -8,48 +8,36 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Student> builder)
         {
-            // 1. Định nghĩa tên bảng 
+            // 1. Tên bảng và Khóa chính
             builder.ToTable("Student");
-
-            // 2. Cấu hình Khóa chính và các thuộc tính
             builder.HasKey(s => s.StudentID);
 
-            builder.Property(s => s.StudentID)
-                   .HasColumnType("varchar(15)") // Khớp hoàn toàn với TypeName = "varchar(15)"
-                   .IsRequired();
+            // 2. Cấu hình thuộc tính
+            builder.Property(s => s.StudentID).HasMaxLength(15);
+            builder.Property(s => s.StudentName).IsRequired().HasMaxLength(100);
+            builder.Property(s => s.Gender).HasMaxLength(10);
+            builder.Property(s => s.Ethnicity).HasMaxLength(30).HasDefaultValue("Kinh");
+            builder.Property(s => s.Religion).HasMaxLength(50).HasDefaultValue("Không");
+            builder.Property(s => s.Nationality).HasMaxLength(50).HasDefaultValue("Việt Nam");
+            builder.Property(s => s.BirthPlace).HasMaxLength(100);
+            builder.Property(s => s.CitizenID).HasMaxLength(12); // Char(12)
+            builder.Property(s => s.PermanentAddress).HasMaxLength(255);
+            builder.Property(s => s.TemporaryAddress).HasMaxLength(255);
 
-            builder.Property(s => s.StudentName)
-                   .HasColumnName("StudentName") // Chỉ định tên cột giống thuộc tính
-                   .HasMaxLength(100)
-                   .IsRequired();
+            // 3. Cấu hình mối quan hệ 1-1 với User
+            builder.HasOne(s => s.User)
+                   .WithOne() // Nếu User không có collection Enrollments
+                   .HasForeignKey<Student>(s => s.UserID)
+                   .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Property(s => s.Gender)
-                   .HasColumnName("Gender")
-                   .HasMaxLength(10)
-                   .IsRequired(false); // Cho phép NULL vì trong Model bạn đặt là string?
-
-            // =======================================================
-            // 🔗 CẤU HÌNH CÁC MỐI QUAN HỆ (RELATIONSHIPS)
-            // =======================================================
-
-            // 3. Quan hệ 1 - 1: Student <-> StudentProfile
-            builder.HasOne(s => s.StudentProfile)
-                   .WithOne(p => p.Student)
-                   .HasForeignKey<StudentProfile>(p => p.StudentID) // Khóa ngoại nằm ở bảng phụ
-                   .OnDelete(DeleteBehavior.Cascade);               // Xóa Student tự động xóa Profile
-
-            // 4. Quan hệ 1 - 1: Student <-> AcademicProfile
             builder.HasOne(s => s.AcademicProfile)
-                   .WithOne(a => a.Student)
-                   .HasForeignKey<AcademicProfile>(a => a.StudentID) // Khóa ngoại nằm ở bảng phụ
+                   .WithOne() // Nếu User không có collection Enrollments
+                   .HasForeignKey<AcademicProfile>(s => s.StudentID)
                    .OnDelete(DeleteBehavior.Cascade);
 
-            // 5. Quan hệ 1 - Nhiều: Student <-> FamilyRelationship
-            builder.HasMany(s => s.FamilyRelationships)
-                   .WithOne(f => f.Student) // Giả định trong Model FamilyRelationship có thuộc tính: public virtual Student? Student { get; set; }
-                   .HasForeignKey(f => f.StudentID)
-                   .OnDelete(DeleteBehavior.Cascade);
 
+            // Đảm bảo UserID là duy nhất trong bảng Student để duy trì 1-1
+            builder.HasIndex(s => s.UserID).IsUnique();
         }
     }
 }

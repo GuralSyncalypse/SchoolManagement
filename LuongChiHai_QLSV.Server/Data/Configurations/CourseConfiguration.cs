@@ -1,4 +1,4 @@
-﻿using LuongChiHai_QLSV.Server.Models;
+﻿using LuongChiHai_QLSV.Server.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,7 +19,7 @@ namespace LuongChiHai_QLSV.Server.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(e => e.CourseCode)
+            builder.Property(e => e.CourseCode).IsRequired()
                 .IsRequired()
                 .HasMaxLength(20);
 

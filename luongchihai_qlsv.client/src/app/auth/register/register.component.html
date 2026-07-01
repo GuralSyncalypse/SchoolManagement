@@ -29,6 +29,16 @@
                 <input type="password" formControlName="password" placeholder="Nhập mật khẩu bí mật..." />
             </div>
 
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" formControlName="email" placeholder="Nhập Email..." />
+            </div>
+
+            <div class="form-group">
+                <label>Số Điện Thoại</label>
+                <input type="text" formControlName="phoneNumber" placeholder="Nhập số điện thoại..." />
+            </div>
+
             <div *ngIf="registerForm.get('roleName')?.value === 'Student'" class="student-info-section">
                 <hr />
                 <p class="section-title">Thông Tin Hồ Sơ Sinh Viên</p>
