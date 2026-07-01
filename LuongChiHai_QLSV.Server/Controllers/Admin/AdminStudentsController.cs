@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
-public class StudentsController : ControllerBase
+[Authorize(Roles = "Admin")]
+public class AdminStudentsController : ControllerBase
 {
     private readonly SchoolContext _context;
-    public StudentsController(SchoolContext context)
+    public AdminStudentsController(SchoolContext context)
     {
         _context = context;
     }
@@ -134,7 +134,6 @@ public class StudentsController : ControllerBase
     // POST: api/Student
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<StudentResponseDto>> PostStudent(StudentRequestDto request)
     {
         // 1. Kiểm tra validation thủ công (tuỳ chọn vì [ApiController] đã làm điều này)
@@ -188,7 +187,6 @@ public class StudentsController : ControllerBase
     }
 
     // DELETE: api/Student/5
-    [Authorize(Roles = "Admin")]
     [HttpDelete("{studentid}")]
     public async Task<IActionResult> DeleteStudent(string? studentid)
     {

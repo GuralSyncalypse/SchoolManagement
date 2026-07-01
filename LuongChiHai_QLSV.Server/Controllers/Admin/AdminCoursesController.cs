@@ -1,14 +1,16 @@
+using LuongChiHai_QLSV.Server.Data;
+using LuongChiHai_QLSV.Server.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using LuongChiHai_QLSV.Server.Entities;
-using LuongChiHai_QLSV.Server.Data;
 
 [Route("api/[controller]")]
 [ApiController]
-public class CoursesController : ControllerBase
+[Authorize(Roles = "Admin")]
+public class AdminCoursesController : ControllerBase
 {
     private readonly SchoolContext _context;
-    public CoursesController(SchoolContext context)
+    public AdminCoursesController(SchoolContext context)
     {
         _context = context;
     }

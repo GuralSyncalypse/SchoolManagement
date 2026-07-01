@@ -1,0 +1,39 @@
+<div class="container">
+
+  <h2>Danh sách sinh viên</h2>
+
+  <table class="table table-bordered">
+
+    <thead>
+      <tr>
+        <th>Mã SV</th>
+        <th>Họ tên</th>
+        <th>Giới tính</th>
+        <th>Dân tộc</th>
+        <th>Địa chỉ</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let s of students">
+
+        <td>{{ s.studentID }}</td>
+        <td>{{ s.studentName }}</td>
+        <td>{{ s.gender }}</td>
+        <td>{{ s.ethnicity }}</td>
+        <td>{{ s.permanentAddress }}</td>
+
+        <td>
+          <button class="btn btn-danger btn-sm"
+                  (click)="deleteStudent(s.studentID)">
+            Xóa
+          </button>
+        </td>
+
+      </tr>
+    </tbody>
+
+  </table>
+
+</div>

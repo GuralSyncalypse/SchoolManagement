@@ -1,23 +1,22 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { LoginComponent } from './auth/login/login.component';
-import { RegisterComponent } from './auth/register/register.component';
+import { LoginComponent } from './features/auth/login/login.component';
+import { RegisterComponent } from './features/auth/register/register.component';
 import { authGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent, canActivate: [authGuard], data: { expectedRoles: ['Admin'] } },
 
-  // Các trang dùng chung cần đăng nhập mới vào được
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard], data: { expectedRoles: ['Admin', 'Student'] } },
-  { path: 'register', component: RegisterComponent },
-  // PHÂN HỆ ADMIN: Chỉ Admin mới được load module quản lý
+  // Tuyến đường dành cho ADMIN
   {
-    path: 'students',
+    path: 'admin',
+    loadChildren: () => import('./features/admin/admin-routing.module').then(m => m.AdminRoutingModule),
     canActivate: [authGuard],
     data: { expectedRoles: ['Admin'] },
-    loadChildren: () => import('./students/students-routing.module').then(m => m.StudentsRoutingModule)
   },
+  // PHÂN HỆ ADMIN: Chỉ Admin mới được load module quản lý
+  
   // {
   //   path: 'courses',
   //   canActivate: [authGuard],
