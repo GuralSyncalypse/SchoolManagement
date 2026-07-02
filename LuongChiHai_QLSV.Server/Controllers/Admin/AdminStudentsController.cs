@@ -1,6 +1,8 @@
 using LuongChiHai_QLSV.Server.Data;
+using LuongChiHai_QLSV.Server.DTOs.Auths;
 using LuongChiHai_QLSV.Server.DTOs.Students;
 using LuongChiHai_QLSV.Server.Entities;
+using LuongChiHai_QLSV.Server.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +14,11 @@ using Microsoft.EntityFrameworkCore;
 public class AdminStudentsController : ControllerBase
 {
     private readonly SchoolContext _context;
-    public AdminStudentsController(SchoolContext context)
+    private readonly IStudentService _studentService;
+    public AdminStudentsController(SchoolContext context, IStudentService studentService)
     {
         _context = context;
+        _studentService = studentService;
     }
 
     // GET: api/Student
@@ -136,68 +140,39 @@ public class AdminStudentsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<StudentResponseDto>> PostStudent(StudentRequestDto request)
     {
-        // 1. Kiểm tra validation thủ công (tuỳ chọn vì [ApiController] đã làm điều này)
-        if (!ModelState.IsValid)
+        try
         {
-            return BadRequest(ModelState);
+            await _studentService.CreateStudentAccountAsync(request);
+
+            var response = new StudentResponseDto
+            {
+                StudentID = request.StudentID,
+                StudentName = request.StudentName,
+                Gender = request.Gender,
+                Ethnicity = request.Ethnicity,
+                PermanentAddress = request.PermanentAddress
+            };
+
+            return CreatedAtAction(nameof(GetStudent), new { studentid = request.StudentID }, response);
         }
-
-        // 2. Kiểm tra trùng lặp mã sinh viên
-        if (await _context.Students.AnyAsync(s => s.StudentID == request.StudentID))
+        catch (Exception ex)
         {
-            return Conflict(new { message = $"Mã sinh viên {request.StudentID} đã tồn tại trong hệ thống." });
+            return StatusCode(500, new
+            {
+                message = "Có lỗi xảy ra",
+                error = ex.Message
+            });
         }
-
-        // 3. Map từ DTO sang Entity
-        var newStudent = new Student
-        {
-            StudentID = request.StudentID,
-            UserID = request.UserID,
-            StudentName = request.StudentName,
-            Gender = request.Gender,
-            BirthDate = request.BirthDate,
-            Ethnicity = request.Ethnicity,
-            Religion = request.Religion,
-            Nationality = request.Nationality,
-            BirthPlace = request.BirthPlace,
-            CitizenID = request.CitizenID,
-            CitizenIDIssueDate = request.CitizenIDIssueDate,
-            CitizenIDIssuePlace = request.CitizenIDIssuePlace,
-            PermanentAddress = request.PermanentAddress,
-            TemporaryAddress = request.TemporaryAddress
-        };
-
-        // 4. Lưu vào cơ sở dữ liệu
-        _context.Students.Add(newStudent);
-        await _context.SaveChangesAsync();
-
-        // 5. Map sang ResponseDTO để trả về (Tránh lỗi Object Cycle)
-        var response = new StudentResponseDto
-        {
-            StudentID = newStudent.StudentID,
-            StudentName = newStudent.StudentName,
-            Gender = newStudent.Gender,
-            Ethnicity = newStudent.Ethnicity,
-            PermanentAddress = newStudent.PermanentAddress
-            // Có thể map thêm các field khác nếu cần
-        };
-
-        // 6. Trả về mã 201 Created cùng với location của resource vừa tạo
-        return CreatedAtAction(nameof(GetStudent), new { studentid = newStudent.StudentID }, response);
     }
 
     // DELETE: api/Student/5
     [HttpDelete("{studentid}")]
     public async Task<IActionResult> DeleteStudent(string? studentid)
     {
-        var student = await _context.Students.FindAsync(studentid);
-        if (student == null)
-        {
-            return NotFound();
-        }
+        if (studentid == null)
+            return BadRequest("Mã sinh viên không được để trống.");
 
-        _context.Students.Remove(student);
-        await _context.SaveChangesAsync();
+        await _studentService.DeleteAsync(studentid);
 
         return NoContent();
     }

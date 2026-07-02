@@ -24,22 +24,21 @@ export interface StudentResponse {
 
 export interface StudentRequest {
   studentID: string;
-  userID: string;
-
+  phoneNumber: string;
+  email: string;
   studentName: string;
-  gender: string;
-  birthDate: Date;
 
-  ethnicity: string;
-  religion: string;
-  nationality: string;
+  gender?: string;
+  birthDate?: Date | string;
+  ethnicity?: string;
+  religion?: string;
+  nationality?: string;
+  birthPlace?: string;
 
-  birthPlace: string;
+  citizenID?: string;
+  citizenIDIssueDate?: Date | string;
+  citizenIDIssuePlace?: string;
 
-  citizenID: string;
-  citizenIDIssueDate: Date;
-  citizenIDIssuePlace: string;
-
-  permanentAddress: string;
-  temporaryAddress: string;
+  permanentAddress?: string;
+  temporaryAddress?: string;
 }

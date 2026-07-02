@@ -82,8 +82,9 @@ namespace LuongChiHai_QLSV.Server.Controllers
                     var newStudent = new Student
                     {
                         StudentID = request.StudentID!,
+                        UserID = newUser.UserID,
                         StudentName = request.StudentName!,
-                        Gender = request.Gender ?? "Khác"
+                        Gender = request.Gender ?? null,
                     };
                     _context.Students.Add(newStudent);
                 }

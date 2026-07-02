@@ -7,18 +7,54 @@
         <h1 class="brand-title">EduPortal Admin</h1>
       </div>
       <nav class="sidebar-menu">
-        <a [routerLink]="['/admin/dashboard']" routerLinkActive="active" class="sidebar-link">
-          <span class="menu-icon">📊</span> Tổng quan
-        </a>
-        <a [routerLink]="['/admin/students']" routerLinkActive="active" class="sidebar-link">
-          <span class="menu-icon">🎓</span> Quản lý học viên
-        </a>
-        <a [routerLink]="['/admin/courses']" routerLinkActive="active" class="sidebar-link">
-          <span class="menu-icon">📚</span> Quản lý khóa học
-        </a>
-        <a [routerLink]="['/admin/enrollments']" routerLinkActive="active" class="sidebar-link">
-          <span class="menu-icon">📝</span> Đăng ký học phần
-        </a>
+
+          <a routerLink="/admin/dashboard" routerLinkActive="active">
+              <i class="fa-solid fa-house"></i>
+              Dashboard
+          </a>
+
+          <details>
+              <summary>
+                  <i class="fa-solid fa-book"></i>
+                  Đào tạo
+              </summary>
+
+              <a routerLink="/admin/semesters">Học kỳ</a>
+              <a routerLink="/admin/courses">Học phần</a>
+              <a routerLink="/admin/offerings">Lớp học phần</a>
+          </details>
+
+          <details>
+              <summary>
+                  <i class="fa-solid fa-users"></i>
+                  Người dùng
+              </summary>
+
+              <a routerLink="/admin/students">Sinh viên</a>
+              <a routerLink="/admin/teachers">Giảng viên</a>
+          </details>
+
+          <details>
+              <summary>
+                  <i class="fa-solid fa-square-poll-vertical"></i>
+                  Điểm
+              </summary>
+
+              <a routerLink="/admin/score-types">Loại điểm</a>
+              <a routerLink="/admin/components">Thành phần điểm</a>
+              <a routerLink="/admin/scores">Nhập điểm</a>
+          </details>
+
+          <a routerLink="/admin/enrollments">
+              <i class="fa-solid fa-pen-to-square"></i>
+              Đăng ký học phần
+          </a>
+
+          <a routerLink="/admin/reports">
+              <i class="fa-solid fa-chart-line"></i>
+              Báo cáo
+          </a>
+
       </nav>
     </div>
     

@@ -1,10 +1,12 @@
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { AdminStudentService } from './student-list.service'
 import { StudentResponse } from '../../../core/models/student.model'
 
 @Component({
   selector: 'app-student-list',
-  standalone: false,
+  standalone: true,
+  imports: [RouterModule],
   templateUrl: './student-list.html',
   styleUrl: './student-list.css',
 })

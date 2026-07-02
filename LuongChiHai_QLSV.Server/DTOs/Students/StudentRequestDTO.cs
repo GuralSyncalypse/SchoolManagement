@@ -8,8 +8,11 @@ namespace LuongChiHai_QLSV.Server.DTOs.Students
         [StringLength(15, ErrorMessage = "Mã sinh viên không quá 15 ký tự")]
         public string StudentID { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "UserID là bắt buộc")]
-        public int UserID { get; set; }
+        [Required(ErrorMessage = "Số điện thoại là bắt buộc")]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email là bắt buộc")]
+        public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Tên sinh viên là bắt buộc")]
         [StringLength(100, ErrorMessage = "Tên sinh viên không quá 100 ký tự")]

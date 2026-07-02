@@ -8,9 +8,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { LoginComponent } from './features/auth/login/login.component';
 import { RegisterComponent } from './features/auth/register/register.component';
 import { StudentList } from './features/admin/student-list/student-list';
+import { CourseList } from './features/admin/course-list/course-list';
+import { UserList } from './features/admin/user-list/user-list';
 
 @NgModule({
-  declarations: [App, LoginComponent, RegisterComponent, StudentList],
+  declarations: [
+    App,
+    LoginComponent,
+    RegisterComponent
+  ],
   imports: [BrowserModule, HttpClientModule, AppRoutingModule, FormsModule, ReactiveFormsModule],
   providers: [
     provideBrowserGlobalErrorListeners(),

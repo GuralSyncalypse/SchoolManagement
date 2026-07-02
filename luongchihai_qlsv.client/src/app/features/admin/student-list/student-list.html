@@ -1,39 +1,82 @@
-<div class="container">
+<div class="page">
 
-  <h2>Danh sách sinh viên</h2>
+  <!-- HEADER -->
+  <div class="page-header">
+    <div>
+      <h2>Danh sách sinh viên</h2>
+      <p>Quản lý thông tin sinh viên trong hệ thống</p>
+    </div>
 
-  <table class="table table-bordered">
+    <button class="btn btn-primary" [routerLink]="['form']">
+      + Thêm sinh viên
+    </button>
+  </div>
 
-    <thead>
-      <tr>
-        <th>Mã SV</th>
-        <th>Họ tên</th>
-        <th>Giới tính</th>
-        <th>Dân tộc</th>
-        <th>Địa chỉ</th>
-        <th>Hành động</th>
-      </tr>
-    </thead>
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <input type="text" placeholder="🔍 Tìm kiếm theo mã, tên..." />
 
-    <tbody>
-      <tr *ngFor="let s of students">
+    <select>
+      <option>Tất cả giới tính</option>
+      <option>Nam</option>
+      <option>Nữ</option>
+    </select>
+  </div>
 
-        <td>{{ s.studentID }}</td>
-        <td>{{ s.studentName }}</td>
-        <td>{{ s.gender }}</td>
-        <td>{{ s.ethnicity }}</td>
-        <td>{{ s.permanentAddress }}</td>
+  <!-- TABLE CARD -->
+  <div class="card">
 
-        <td>
-          <button class="btn btn-danger btn-sm"
-                  (click)="deleteStudent(s.studentID)">
-            Xóa
-          </button>
-        </td>
+    <table>
+      <thead>
+        <tr>
+          <th>Mã SV</th>
+          <th>Họ tên</th>
+          <th>Giới tính</th>
+          <th>Dân tộc</th>
+          <th>Địa chỉ</th>
+          <th width="120">Hành động</th>
+        </tr>
+      </thead>
 
-      </tr>
-    </tbody>
+      <tbody>
+        @for (student of students; track student.studentID) {
+        <tr>
+          <td class="code">{{ student.studentID }}</td>
 
-  </table>
+          <td class="name">
+            {{ student.studentName }}
+          </td>
+
+          <td>
+            <span class="badge" [class.male]="student.gender === 'Nam'"
+                  [class.female]="student.gender === 'Nữ'">
+              {{ student.gender }}
+            </span>
+          </td>
+
+          <td>{{ student.ethnicity }}</td>
+          <td class="address">{{ student.permanentAddress }}</td>
+
+          <td>
+            <div class="actions">
+              <button class="btn-icon edit">✏</button>
+              <button class="btn-icon delete"
+                      (click)="deleteStudent(student.studentID)">
+                🗑
+              </button>
+            </div>
+          </td>
+        </tr>
+        } @empty {
+        <tr>
+          <td colspan="6" class="empty">
+            Không có sinh viên nào
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+  </div>
 
 </div>
